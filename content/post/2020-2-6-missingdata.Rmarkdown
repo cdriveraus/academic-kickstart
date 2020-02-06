@@ -1,0 +1,106 @@
+---
+title: Missing data imputation in ctsem -- Kalman filter / smoother.
+author: Charles Driver
+date: '2020-2-6'
+slug: missingdata
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2019-12-19T18:33:24+01:00'
+featured: no
+image:
+  caption: ''
+focal_point: ''
+preview_only: no
+projects: []
+---
+
+  ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities in the parameters. This is a super brief demo of missing data imputation using a Kalman smoother -- for a more complete quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for even more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,cache=FALSE,warning=FALSE,message=FALSE,results='hide')
+slug <- 'missingdata'
+
+dir.create(slug)
+
+savedir <- normalizePath(paste0(getwd(),'/',slug))
+```
+
+# Data
+Lets load ctsem (if you haven't installed it see the quick start post!) and pull in some data:
+
+```{r results='tidy'}
+library(ctsem)
+ssdat <- data.frame(id=1,
+  time=do.call(seq,as.list(attributes(sunspot.year)$tsp))[1:40],
+  ss=sunspot.year[1:40])
+
+missings <- c(6,26,35) #a few random observations...
+
+ssdatmissings=ssdat #save the missings to check later
+ssdatmissings$ss[-missings]<-NA
+
+ssdat$ss[missings]<-NA #remove the selected obs from our analysis data set
+
+head(ssdat)
+```
+
+
+# Model
+If we're going to impute missing data, we need some kind of model for the imputation. The default model in ctsem is a first order auto / cross regressive style model, in either discrete or continuous time. There is correlated system noise, and measurement error. When multiple subjects are specified, the default is to have random (subject specific) initial states and measurement intercepts (with correlation between the two). For our purposes here, we're going to rely on the defaults, and use a discrete time, difference equation format. 
+```{r}
+ssmodel <- ctModel(type='stanct',
+  manifestNames='ss',
+  latentNames=c('lss'),
+  T0VAR=1e-3, #only one subject, must fix starting variance
+  LAMBDA=1)
+
+ctModelLatex(ssmodel) 
+```
+
+
+```{r TEX,echo=FALSE,fig.height=6}
+ctModelLatex(ssmodel,textsize = 'footnotesize', folder=savedir,
+  filename = 'mdefaulttex',open=FALSE)
+
+library(magick) 
+tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
+
+plot(tiger)
+#image_write(tiger,paste0(savedir,'/mdefaulttex.png'),format = 'png')
+#knitr::include_graphics(paste0(savedir,'/mdefaulttex.png'))
+#![tex](mdefaulttex.png)
+```
+
+Fit using optimization and maximum likelihood:
+```{r}
+ssfit<- ctStanFit(ssdat, ssmodel, optimize=TRUE, nopriors=TRUE, cores=2)
+```
+
+Then we can use summary and plotting functions:
+```{r }
+summary(ssfit)
+
+kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predictions.
+  kalmanvec=c('y','yprior'),timestep=.01)
+
+ks<-ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
+  kalmanvec=c('y','ysmooth'),timestep=.01 )
+
+```
+
+```{r }
+library(ggplot2)
+kp= kp + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
+    Element='y',Time=ssdatmissings$time), col='black')
+plot(kp)
+
+ks= ks + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
+    Element='y',Time=ssdatmissings$time), col='black')
+plot(ks)
+
+```
+

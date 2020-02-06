@@ -1,0 +1,101 @@
+
+\documentclass[a4paper,landscape]{report}
+\usepackage[margin=1cm]{geometry}
+\usepackage{amsmath} %for multiple line equations
+\usepackage{bm}
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}}
+
+
+\begin{document}
+\thispagestyle{empty}
+\setcounter{MaxMatrixCols}{200}
+ \begin{footnotesize}
+  \begin{align*}
+  &\underbrace{\mathrm{d}
+    \begin{bmatrix}
+\text{lss}
+\end{bmatrix} 
+    \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
+      \underbrace{
+        \begin{bmatrix}
+\text{drift\_lss\_lss}
+\end{bmatrix}
+      }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
+        \begin{bmatrix}
+\text{lss}
+\end{bmatrix} 
+        \big{(}t\big{)}
+      }_{\vect{\eta} (t)}	+ \underbrace{
+        \begin{bmatrix}
+0
+\end{bmatrix}
+      }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
+    & \qquad \qquad \quad cholsdcor\bigg(\underbrace{
+      \begin{bmatrix}
+\text{diffusion\_lss\_lss}
+\end{bmatrix}
+    }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}\bigg)
+    \underbrace{\mathrm{d}
+      \begin{bmatrix}
+W_{1}
+\end{bmatrix} 
+      (t)}_{\mathrm{d} \vect{W}(t)} \\ \\
+          &\underbrace{
+            \begin{bmatrix}
+W_{1}
+\end{bmatrix}  
+            (t+u)}_{\vect{W}(t+u)} -   \underbrace{\begin{bmatrix}
+W_{1}
+\end{bmatrix}  
+            (t)}_{\vect{W}(t)} \sim  \mathrm{N} \left(
+              \begin{bmatrix}
+0
+\end{bmatrix}, \begin{bmatrix}
+\text{u-t}
+\end{bmatrix} \right) \\ \\
+&\underbrace{
+      \begin{bmatrix}
+\text{ss}
+\end{bmatrix}  
+      (t)}_{\vect{Y}(t)} = 
+        \underbrace{
+          \begin{bmatrix}
+1
+\end{bmatrix} 
+        }_{\underbrace{\vect{\Lambda}}_\textrm{LAMBDA}} \underbrace{
+          \begin{bmatrix}
+\text{lss}
+\end{bmatrix} 
+          (t)}_{\vect{\eta}(t)} +
+        \underbrace{
+          \begin{bmatrix}
+\text{manifestmeans\_ss}
+\end{bmatrix} 
+        }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
+              \underbrace{
+                \begin{bmatrix}
+\text{manifestvar\_ss\_ss}
+\end{bmatrix}  
+              }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
+              \underbrace{
+          \begin{bmatrix}
+\epsilon_{1}
+\end{bmatrix} 
+          (t)}_{\vect{\epsilon}(t)} \\ \\
+          &\underbrace{
+            \begin{bmatrix}
+\epsilon_{1}
+\end{bmatrix} 
+            (t)}_{\vect{\epsilon}(t)} \sim  \mathrm{N} \left(
+              \begin{bmatrix}
+0
+\end{bmatrix}
+              ,
+                \begin{bmatrix}
+1
+\end{bmatrix} \right) \\
+&\textrm{cholsdcor = Function converting lower tri matrix of std dev and unconstrained correlation to Cholesky factor.} \\ \\ 
+&\textrm{See Driver \& Voelkle (2018) p11.}
+      \end{align*}
+      \end{footnotesize}
+      \end{document}
