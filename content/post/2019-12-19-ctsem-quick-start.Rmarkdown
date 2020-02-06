@@ -16,12 +16,12 @@ image:
   preview_only: no
 projects: []
 ---
-
+ 
 ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities in the parameters. In this post I'll walk through some of the basics of ctsem usage, for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE,results='hide')
+knitr::opts_chunk$set(collapse = TRUE,cache=FALSE,warning=FALSE,message=FALSE,results='hide')
 slug <- 'growth-curves-in-continuous-time' 
 dir.create(slug)
 savedir <- normalizePath(paste0(getwd(),'/',slug)) 
