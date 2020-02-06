@@ -29,8 +29,8 @@ Lets load ctsem (if you haven't installed it see the quick start post!) and pull
 ```r
 library(ctsem)
 ssdat <- data.frame(id=1,
-  time=do.call(seq,as.list(attributes(sunspot.year)$tsp))[1:40],
-  ss=sunspot.year[1:40])
+  time=do.call(seq,as.list(attributes(sunspot.year)$tsp)),
+  ss=sunspot.year)
 
 missings <- c(6,26,35) #a few random observations...
 
@@ -78,7 +78,7 @@ Then we can use summary and plotting functions:
 summary(ssfit)
 
 kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predictions.
-  kalmanvec=c('y','yprior'),timestep=.01)
+  kalmanvec=c('y','yprior'),timestep=.1)
 ```
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-1.png" width="672" />
@@ -86,7 +86,7 @@ kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predi
 ```r
 
 ks<-ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
-  kalmanvec=c('y','ysmooth'),timestep=.01 )
+  kalmanvec=c('y','ysmooth'),timestep=.1 )
 ```
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-2.png" width="672" />
@@ -95,7 +95,8 @@ ks<-ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent 
 ```r
 library(ggplot2)
 kp= kp + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black')
+    Element='y',Time=ssdatmissings$time), col='black') + 
+  coord_cartesian(xlim=c(1700,1740))
 plot(kp)
 ```
 
@@ -104,7 +105,8 @@ plot(kp)
 ```r
 
 ks= ks + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black')
+    Element='y',Time=ssdatmissings$time), col='black') + 
+  coord_cartesian(xlim=c(1700,1740))
 plot(ks)
 ```
 

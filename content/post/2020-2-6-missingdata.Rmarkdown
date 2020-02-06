@@ -35,8 +35,8 @@ Lets load ctsem (if you haven't installed it see the quick start post!) and pull
 ```{r results='tidy'}
 library(ctsem)
 ssdat <- data.frame(id=1,
-  time=do.call(seq,as.list(attributes(sunspot.year)$tsp))[1:40],
-  ss=sunspot.year[1:40])
+  time=do.call(seq,as.list(attributes(sunspot.year)$tsp)),
+  ss=sunspot.year)
 
 missings <- c(6,26,35) #a few random observations...
 
@@ -85,21 +85,23 @@ Then we can use summary and plotting functions:
 summary(ssfit)
 
 kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predictions.
-  kalmanvec=c('y','yprior'),timestep=.01)
+  kalmanvec=c('y','yprior'),timestep=.1)
 
 ks<-ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
-  kalmanvec=c('y','ysmooth'),timestep=.01 )
+  kalmanvec=c('y','ysmooth'),timestep=.1 )
 
 ```
 
 ```{r }
 library(ggplot2)
 kp= kp + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black')
+    Element='y',Time=ssdatmissings$time), col='black') + 
+  coord_cartesian(xlim=c(1700,1740))
 plot(kp)
 
 ks= ks + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black')
+    Element='y',Time=ssdatmissings$time), col='black') + 
+  coord_cartesian(xlim=c(1700,1740))
 plot(ks)
 
 ```
