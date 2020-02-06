@@ -85,7 +85,7 @@ ctModelLatex(ssmodel)
 ```
 
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/TEX-1.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/TEX-1.png" width="672" />
 
 Fit using maximum likelihood:
 
@@ -102,7 +102,7 @@ ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predictio
   kalmanvec=c('y','yprior'), timestep=.1)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 
 ```r
 
@@ -110,21 +110,21 @@ ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent stat
   kalmanvec=c('etasmooth'), timestep=.1)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-2.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-2.png" width="672" />
 
 ```r
 
 ctStanDiscretePars(ssfit,plot=TRUE) #impulse response
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-3.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-7-3.png" width="672" />
 
 ```r
 
 ctModelLatex(ssfit)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/TEX2-1.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/TEX2-1.png" width="672" />
 
 To fit using a Bayesian approach, we need to pay more attention to our transformations / priors:
 
@@ -133,7 +133,7 @@ To fit using a Bayesian approach, we need to pay more attention to our transform
 plot(ssmodel)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" /><img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-2.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" /><img src="2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-2.png" width="672" />
 
 Even though we only have one subject for this case, the model doesn't know that, and by default intercept style parameters are allowed to vary across subjects -- hence the blue and red plots showing possible distributions of subject parameters conditional on a mean of 1 standard deviation less or more.
 
@@ -176,7 +176,7 @@ ggplot(data=ssdat,mapping = aes(y=sunspots,x=time)) +
   geom_line(colour='black',size=1)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 
 Since this doesn't look obviously unreasonable, we'll go ahead and fit using Stan's Hamiltonian Monte Carlo and plot the posterior distributions of parameters:
 
@@ -186,7 +186,7 @@ ssfit <- ctStanFit(ssdat, ssmodel, iter=300, chains=2, cores=2)
 ctStanPlotPost(ssfit)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-9-2.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-9-2.png" width="672" />
 
 Evidently our priors on the starting points (t0) for the latent processes could have been better, but this should not have too large an impact on the model overall, given the length of the series.
 
@@ -204,6 +204,6 @@ ggplot(data=ssdat,mapping = aes(y=sunspots,x=time)) +
   geom_line(colour='black',size=1)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+<img src="2019-12-19-ctsem-quick-start_files/figure-html/unnamed-chunk-10-1.png" width="672" />
 
 
