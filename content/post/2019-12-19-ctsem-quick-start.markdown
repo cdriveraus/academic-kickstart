@@ -76,7 +76,7 @@ ssmodel <- ctModel(type='stanct',
   'a21 | -log1p(exp(-param))-1e-5', 'a22'),
   MANIFESTMEANS=c('m1'),
   MANIFESTVAR='merror',
-  T0VAR=1, #init variance, would have been set automatically since only 1 subject
+  T0VAR=1, #init variance, would have been fixed automatically since only 1 subject
   CINT=0,
   DIFFUSION=c(0, 0,
   0, "diffusion"))

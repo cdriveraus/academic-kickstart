@@ -36,13 +36,13 @@ Lets load ctsem (if you haven't installed it see the quick start post!), generat
 set.seed(1)
 library(ctsem)
 
-y <- 0
-n <- 40
-for(i in 2:n){
+y <- 0 #start value
+n <- 40 #number of obs
+for(i in 2:n){ 
   y[i] = .98 * y[i-1] + .5 + rnorm(1,0,.5) # ar * y + intercept + system noise
 }
-y=y+rnorm(n,0,.5) #measurement error
-y=data.frame(id=1,y=y,time=1:n)
+y=y+rnorm(n,0,.5) #add measurement error
+y=data.frame(id=1,y=y,time=1:n) #create a data.frame for ctsem
 
 missings <- c(5,17:19,26,35) #a few random observations...
 
@@ -60,9 +60,9 @@ If we're going to impute missing data, we need some kind of model for the imputa
 ```{r}
 model <- ctModel(type='stanct',
   manifestNames='y',latentNames='ly',
-  T0VAR=1e-3, #only one subject, must fix starting variance
-  MANIFESTVAR=.5, #not easy to estimate with such limited data
-  LAMBDA=1)
+  T0VAR=.01, #only one subject, must fix starting variance
+  MANIFESTVAR=.5, #fixed measurement error, not easy to estimate with such limited data
+  LAMBDA=1) #Factor loading fixed to 1
 
 ctModelLatex(model) 
 ```
@@ -107,7 +107,7 @@ plot(ks)
 
 ```
 
-To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.)
+To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.) If we wanted more or different values to be available from such an approach, the easiest way is to include them as missing observations in the dataset used for fitting.
 ```{r }
 k<-ctStanKalman(fit,collapsefunc = mean) 
 str(k$ysmooth) 
