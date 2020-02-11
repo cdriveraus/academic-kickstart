@@ -30,12 +30,12 @@ Lets load ctsem (if you haven't installed it see the quick start post!), generat
 set.seed(1)
 library(ctsem)
 
-y <- 0 #start value
+y <- 6 #start value
 n <- 40 #number of obs
 for(i in 2:n){ 
-  y[i] = .98 * y[i-1] + .5 + rnorm(1,0,.5) # ar * y + intercept + system noise
+  y[i] = .9 * y[i-1] + .1 + rnorm(1,0,.5) # ar * y + intercept + system noise
 }
-y=y+rnorm(n,0,.5) #add measurement error
+y=y+rnorm(n,0,.2) #add measurement error
 y=data.frame(id=1,y=y,time=1:n) #create a data.frame for ctsem
 
 missings <- c(5,17:19,26,35) #a few random observations...
@@ -46,13 +46,13 @@ ymissings$y[-missings]<-NA
 y$y[missings]<-NA #remove the selected obs from our analysis data set
 
 head(y)
-##   id         y time
-## 1  1 0.3815879    1
-## 2  1 0.1045113    2
-## 3  1 0.6481785    3
-## 4  1 1.1900295    4
-## 5  1        NA    5
-## 6  1 2.4002861    6
+##   id        y time
+## 1  1 6.152635    1
+## 2  1 5.153868    2
+## 3  1 4.809245    3
+## 4  1 4.195504    4
+## 5  1       NA    5
+## 6  1 4.220329    6
 ```
 
 
@@ -63,7 +63,7 @@ If we're going to impute missing data, we need some kind of model for the imputa
 model <- ctModel(type='stanct',
   manifestNames='y',latentNames='ly',
   T0VAR=.01, #only one subject, must fix starting variance
-  MANIFESTVAR=.5, #fixed measurement error, not easy to estimate with such limited data
+  MANIFESTVAR=.2, #fixed measurement error, not easy to estimate with such limited data
   LAMBDA=1) #Factor loading fixed to 1
 
 ctModelLatex(model) 
@@ -72,7 +72,7 @@ ctModelLatex(model)
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/TEX-1.png" width="672" />
 
-Fit using optimization and maximum likelihood:
+Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
 
 ```r
 fit<- ctStanFit(y, model, optimize=TRUE, nopriors=TRUE, cores=2)

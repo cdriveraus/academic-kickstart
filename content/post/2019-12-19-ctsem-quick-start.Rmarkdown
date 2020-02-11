@@ -21,9 +21,10 @@ ctsem is R software for statistical modelling using hierarchical state space mod
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE,results='hide')
+knitr::opts_chunk$set(collapse = TRUE,cache=FALSE,warning=FALSE,message=FALSE,results='hide')
 slug <- 'ctsem-quick-start' 
 dir.create(slug)
+
 savedir <- normalizePath(paste0(getwd(),'/',slug)) 
 ```
 
@@ -68,7 +69,7 @@ ssmodel <- ctModel(type='stanct',
   DRIFT=c(0, 1,
   'a21 | -log1p(exp(-param))-1e-5', 'a22'),
   MANIFESTMEANS=c('m1'),
-  MANIFESTVAR='merror',
+  MANIFESTVAR=0,
   T0VAR=1, #init variance, would have been fixed automatically since only 1 subject
   CINT=0,
   DIFFUSION=c(0, 0,
@@ -126,7 +127,7 @@ To fit using a Bayesian approach, we need to pay more attention to our transform
 plot(ssmodel)
 ```
 
-Even though we only have one subject for this case, the model doesn't know that, and by default intercept style parameters are allowed to vary across subjects -- hence the blue and red plots showing possible distributions of subject parameters conditional on a mean of 1 standard deviation less or more.
+Even though we only have one subject for this case, the model doesn't know that until we fit it to data, and by default intercept style parameters are allowed to vary across subjects -- hence the blue and red plots showing possible distributions of subject parameters conditional on a mean of 1 standard deviation less or more.
 
 Most priors should be workable, but since the ctsem defaults are designed for data centered around zero, the manifest means parameter will need the prior adjusted. At the same time we may as well disable individual variation, possible either by using the 3rd parameter slot (with | separators) or by modifying the object directly after specification. Both approaches are shown here:
 
@@ -135,7 +136,7 @@ ssmodel <- ctModel(type='stanct',
   manifestNames='sunspots',
   latentNames=c('ss_level', 'ss_velocity'),
   LAMBDA=c( 1, 0),
-  T0MEANS=c('t0_sslevel||FALSE', 't0_ssvelocity|param*.001|FALSE'),
+  T0MEANS=c('t0_sslevel||FALSE', 't0_ssvelocity||FALSE'),
   DRIFT=c(0, 1,
   'a21 | -log1p(exp(-param))-1e-5','a22'),
   MANIFESTMEANS=c('m1|param*10+44'),
@@ -148,7 +149,7 @@ ssmodel <- ctModel(type='stanct',
 ssmodel$pars$indvarying <- FALSE
 ```
 
-param*10+44 implies that param, a standard normal parameter, is multiplied by 10 and offset by +44, to give a normal distribution centered at 44 with a standard deviation of 10.
+Looking at the MANIFESTMEANS specification, we've used the second slot (via | separator) to modify the prior / transformation. param*10+44 implies that param, a standard normal parameter, is multiplied by 10 and offset by +44, to give a normal distribution centered at 44 with a standard deviation of 10.
 
 We can use the functions of ctsem to generate data from our prior distribution, according to the structure (i.e. the timing of observations and any covariates) specified in our data, then use this to create a prior predictive plot -- comparing samples of possible trajectories from the prior distribution to our actual data:
 
