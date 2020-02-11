@@ -33,7 +33,7 @@ savedir <- normalizePath(paste0(getwd(),'/',slug))
 Lets load ctsem (if you haven't installed it see the quick start post!), generate some data from a simple discrete time model, and create some artificial missingness:
 
 ```{r results='tidy'}
-set.seed(2)
+set.seed(3)
 library(ctsem)
 
 y <- 6 #start value

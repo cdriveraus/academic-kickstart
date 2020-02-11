@@ -27,7 +27,7 @@ Lets load ctsem (if you haven't installed it see the quick start post!), generat
 
 
 ```r
-set.seed(2)
+set.seed(3)
 library(ctsem)
 
 y <- 6 #start value
@@ -47,12 +47,12 @@ y$y[missings]<-NA #remove the selected obs from our analysis data set
 
 head(y)
 ##   id        y time
-## 1  1 5.950697    1
-## 2  1 4.974825    2
-## 3  1 4.346992    3
-## 4  1 4.990513    4
+## 1  1 6.158752    1
+## 2  1 5.176335    2
+## 3  1 4.408774    3
+## 4  1 4.592951    4
 ## 5  1       NA    5
-## 6  1 3.944376    6
+## 6  1 3.284191    6
 ```
 
 
