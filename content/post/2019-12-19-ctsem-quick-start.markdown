@@ -133,7 +133,7 @@ To fit using a Bayesian approach, we need to pay more attention to our transform
 plot(ssmodel)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" />
+<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" /><img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-2.png" width="672" />
 
 Even though we only have one subject for this case, the model doesn't know that until we fit it to data, and by default intercept style parameters are allowed to vary across subjects -- hence the blue and red plots showing possible distributions of subject parameters conditional on a mean of 1 standard deviation less or more.
 
