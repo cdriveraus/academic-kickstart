@@ -13,16 +13,16 @@
   \begin{align*}
   &\underbrace{\mathrm{d}
     \begin{bmatrix}
-\text{lss}
+\text{ly}
 \end{bmatrix} 
     \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
       \underbrace{
         \begin{bmatrix}
-\text{drift\_lss\_lss}
+\text{drift\_ly\_ly}
 \end{bmatrix}
       }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
         \begin{bmatrix}
-\text{lss}
+\text{ly}
 \end{bmatrix} 
         \big{(}t\big{)}
       }_{\vect{\eta} (t)}	+ \underbrace{
@@ -32,7 +32,7 @@
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
     & \qquad \qquad \quad cholsdcor\bigg(\underbrace{
       \begin{bmatrix}
-\text{diffusion\_lss\_lss}
+\text{diffusion\_ly\_ly}
 \end{bmatrix}
     }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}\bigg)
     \underbrace{\mathrm{d}
@@ -55,7 +55,7 @@ W_{1}
 \end{bmatrix} \right) \\ \\
 &\underbrace{
       \begin{bmatrix}
-\text{ss}
+\text{y}
 \end{bmatrix}  
       (t)}_{\vect{Y}(t)} = 
         \underbrace{
@@ -64,17 +64,17 @@ W_{1}
 \end{bmatrix} 
         }_{\underbrace{\vect{\Lambda}}_\textrm{LAMBDA}} \underbrace{
           \begin{bmatrix}
-\text{lss}
+\text{ly}
 \end{bmatrix} 
           (t)}_{\vect{\eta}(t)} +
         \underbrace{
           \begin{bmatrix}
-\text{manifestmeans\_ss}
+\text{manifestmeans\_y}
 \end{bmatrix} 
         }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
               \underbrace{
                 \begin{bmatrix}
-\text{manifestvar\_ss\_ss}
+0.5
 \end{bmatrix}  
               }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
               \underbrace{

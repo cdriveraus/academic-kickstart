@@ -1,5 +1,5 @@
 ---
-title: Missing data imputation in ctsem -- Kalman filter / smoother.
+title: Kalman filter vs smoother -- Missing data imputation in ctsem.
 author: Charles Driver
 date: '2020-2-6'
 slug: missingdata
@@ -17,50 +17,56 @@ preview_only: no
 projects: []
 ---
 
-  ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities in the parameters. This is a super brief demo of missing data imputation using a Kalman smoother -- for a more complete quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for even more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+  ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. This is a super brief demo to show the basic intuition for Kalman filtering / smoother, and missing data imputation -- for a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
 
 
 
 
 # Data
-Lets load ctsem (if you haven't installed it see the quick start post!) and pull in some data:
+Lets load ctsem (if you haven't installed it see the quick start post!), generate some data from a simple discrete time model, and create some artificial missingness:
 
 
 ```r
+set.seed(1)
 library(ctsem)
-ssdat <- data.frame(id=1,
-  time=do.call(seq,as.list(attributes(sunspot.year)$tsp)),
-  ss=sunspot.year)
 
-missings <- c(6,26,35) #a few random observations...
+y <- 0
+n <- 40
+for(i in 2:n){
+  y[i] = .98 * y[i-1] + .5 + rnorm(1,0,.5) # ar * y + intercept + system noise
+}
+y=y+rnorm(n,0,.5) #measurement error
+y=data.frame(id=1,y=y,time=1:n)
 
-ssdatmissings=ssdat #save the missings to check later
-ssdatmissings$ss[-missings]<-NA
+missings <- c(5,17:19,26,35) #a few random observations...
 
-ssdat$ss[missings]<-NA #remove the selected obs from our analysis data set
+ymissings=y #save the missings to check later
+ymissings$y[-missings]<-NA
 
-head(ssdat)
-##   id time ss
-## 1  1 1700  5
-## 2  1 1701 11
-## 3  1 1702 16
-## 4  1 1703 23
-## 5  1 1704 36
-## 6  1 1705 NA
+y$y[missings]<-NA #remove the selected obs from our analysis data set
+
+head(y)
+##   id         y time
+## 1  1 0.3815879    1
+## 2  1 0.1045113    2
+## 3  1 0.6481785    3
+## 4  1 1.1900295    4
+## 5  1        NA    5
+## 6  1 2.4002861    6
 ```
 
 
 # Model
-If we're going to impute missing data, we need some kind of model for the imputation. The default model in ctsem is a first order auto / cross regressive style model, in either discrete or continuous time. There is correlated system noise, and measurement error. When multiple subjects are specified, the default is to have random (subject specific) initial states and measurement intercepts (with correlation between the two). For our purposes here, we're going to rely on the defaults, and use a discrete time, difference equation format. 
+If we're going to impute missing data, we need some kind of model for the imputation. The default model in ctsem is a first order auto / cross regressive style model, in either discrete or continuous time. There is correlated system noise, and uncorrelated measurement error. When multiple subjects are specified, the default is to have random (subject specific) initial states and measurement intercepts (with correlation between the two). For our purposes here, we're going to rely mostly on the defaults, and use a continuous time, differential equation format -- the discrete time form would also work fine for these purposes, but visualising the difference between the filter and smoother is much more obvious with the continuous time approach. Besides the defaults, we also fix the initial latent variance to a very low value (because we only have one subject), and the measurement error variance (because having system and measurement noise makes for better visuals but we can't easily estimate both with so little data). 
 
 ```r
-ssmodel <- ctModel(type='stanct',
-  manifestNames='ss',
-  latentNames=c('lss'),
+model <- ctModel(type='stanct',
+  manifestNames='y',latentNames='ly',
   T0VAR=1e-3, #only one subject, must fix starting variance
+  MANIFESTVAR=.5, #not easy to estimate with such limited data
   LAMBDA=1)
 
-ctModelLatex(ssmodel) 
+ctModelLatex(model) 
 ```
 
 
@@ -69,15 +75,15 @@ ctModelLatex(ssmodel)
 Fit using optimization and maximum likelihood:
 
 ```r
-ssfit<- ctStanFit(ssdat, ssmodel, optimize=TRUE, nopriors=TRUE, cores=2)
+fit<- ctStanFit(y, model, optimize=TRUE, nopriors=TRUE, cores=2)
 ```
 
-Then we can use summary and plotting functions:
+Then we can use summary and plotting functions. Note the differences between the first plot, using the Kalman *filter* predictions for each point, where the model simply extrapolates forwards in time and has to make sudden updates as new information arrives, and the smoothed estimates, which are conditional on *all* time points in the data -- past, present, and future. These plots are based on the maximum likelihood estimate / posterior mean of the parameters. 
 
 ```r
-summary(ssfit)
+summary(fit)
 
-kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predictions.
+kp<-ctKalman(fit,plot=TRUE, #predicted (conditioned on past time points) predictions.
   kalmanvec=c('y','yprior'),timestep=.1)
 ```
 
@@ -85,18 +91,18 @@ kp<-ctKalman(ssfit,plot=TRUE, #predicted (conditioned on past time points) predi
 
 ```r
 
-ks<-ctKalman(ssfit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
+ks<-ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
   kalmanvec=c('y','ysmooth'),timestep=.1 )
 ```
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-2.png" width="672" />
 
+We can modify the ggplot objects we created to include the data we dropped:
 
 ```r
 library(ggplot2)
-kp= kp + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black') + 
-  coord_cartesian(xlim=c(1700,1740))
+kp= kp + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
+    Element='y',Time=ymissings$time), col='black')
 plot(kp)
 ```
 
@@ -104,11 +110,72 @@ plot(kp)
 
 ```r
 
-ks= ks + geom_point(data = data.frame(Variable='ss', Value=ssdatmissings$ss,
-    Element='y',Time=ssdatmissings$time), col='black') + 
-  coord_cartesian(xlim=c(1700,1740))
+ks= ks + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
+    Element='y',Time=ymissings$time), col='black')
 plot(ks)
 ```
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
+To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.)
+
+```r
+k<-ctStanKalman(fit,collapsefunc = mean) 
+str(k$ysmooth) 
+k$ysmooth[1,missings,]
+```
+
+
+<!-- We can also use the estimated mean and uncertainty to generate new data. For imputing purposes, we would generally want to account for uncertainty about the model parameters also, so we begin by creating mean and uncertainty estimates for random parameter vectors from our parameter distribution.  -->
+<!-- ```{r } -->
+
+<!-- imputed <- ctStanGenerateFromFit(fit,fullposterior=TRUE,imputemissings = TRUE,nsamples = 50) -->
+
+<!-- matplot(imputed$generated$Y[,,1],type='l') -->
+
+<!-- nsamples = 50 -->
+<!-- k <- ctStanKalman(fit = fit, nsamples = nsamples) -->
+
+<!-- matplot( t(k$ysmooth[,,1]), #selecting first manifest variable -->
+<!--   type='l',lty=1,col=rgb(1,0,0,.3)) -->
+<!-- ``` -->
+
+<!-- As expected from such little data, there is quite some variability in the expected trajectory due to parameter uncertainty. We would also expect variability in the uncertainty (ysmoothcov) though this is not visualised. -->
+
+<!-- For the next step, we randomly generate samples from our randomly drawn trajectories plus uncertainties. -->
+
+<!-- ```{r } -->
+<!-- newdat <-k$yprior -->
+<!-- for(sampi in 1:nsamples){ -->
+<!--   for(rowi in 1:length(k$time)){ -->
+<!--     newdat[sampi,rowi,] <- k$yprior[sampi,rowi,] + #mean estimate -->
+<!--       t(chol(k$ypriorcov[sampi,rowi,,])) %*% #plus Cholesky factor of cov matrix -->
+<!--       rnorm(dim(newdat)[3]) #multiplied by some standard normal samples -->
+<!--   } -->
+<!-- } -->
+<!-- matplot( t(k$ysmooth[,,1]), #plot expected trajectories -->
+<!--   type='l',lty=1,col=rgb(1,0,0,.3)) -->
+
+<!-- matplot(t(newdat[,,1]), #and sampled trajectories -->
+<!--   type='p',pch=1,col=rgb(0,0,1,.3),add=TRUE) -->
+
+<!-- ``` -->
+
+<!-- With this, we could select just our missing time points, leaving us with an nsamples by nmissingobs by nvariables array: -->
+
+<!-- ```{r } -->
+<!-- imputed <- newdat[,missings,,drop=FALSE] -->
+<!-- ``` -->
+
+<!-- For a sanity check, lets compare to the original plots: -->
+
+<!-- ```{r } -->
+<!-- library(plyr) -->
+<!-- newdf=adply(newdat,c(1,2,3)) #convert to data.frame -->
+<!-- newdf[,2] = as.numeric(newdf[,2]) -->
+<!-- colnames(newdf)[c(2,3,4)] <- c('Time','Element','Value') -->
+
+<!-- ks= ks + geom_point(data = newdf[newdf$Time %in% missings,], col='black',alpha=.3) -->
+<!-- plot(ks) -->
+
+<!-- ``` -->
