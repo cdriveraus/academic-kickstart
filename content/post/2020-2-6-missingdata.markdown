@@ -66,7 +66,7 @@ model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
   MANIFESTVAR=.2, #fixed measurement error, not easy to estimate with such limited data
   LAMBDA=1) #Factor loading fixed to 1
 
-ctModelLatex(model) 
+ctModelLatex(model) #requires latex install -- will prompt with instructions in any case
 ```
 
 

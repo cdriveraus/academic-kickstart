@@ -192,6 +192,8 @@ ctStanPlotPost(ssfit)
 
 Evidently our priors on the starting points (t0) for the latent processes could have been better, but this should not have too large an impact on the model overall, given the length of the series.
 
+Given the model fit, we can also generate new data from the posterior, in the same structure (re missingness and covariates) as the original, then compare various quantities between the generated and the actual data. The following shows 3 samples of generated data (in colour) against the original (in black).
+
 
 ```r
 postpred <- ctStanGenerateFromFit(ssfit, fullposterior = TRUE, nsamples = 3)
