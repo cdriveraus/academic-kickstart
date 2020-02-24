@@ -1,16 +1,47 @@
 
-\documentclass[a4paper,landscape]{report}
-\usepackage[margin=1cm]{geometry}
-\usepackage{amsmath} %for multiple line equations
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\geometry{paperwidth=\maxdimen,paperheight=\maxdimen,margin=1cm}
+
+\usepackage[fleqn]{amsmath} %for multiple line equations
+\usepackage[active,tightpage,displaymath]{preview}
 \usepackage{bm}
 \newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}}
 
-
 \begin{document}
-\thispagestyle{empty}
-\setcounter{MaxMatrixCols}{200}
+\pagenumbering{gobble}
  \begin{footnotesize}
+ \setcounter{MaxMatrixCols}{200}
   \begin{align*}
+  \textrm{Subject parameter distribution: }
+             &\underbrace{\begin{bmatrix}
+\text{T0m\_ly}_i\\ 
+\text{mm\_y}_i
+\end{bmatrix} 
+            }_{\vect{\phi}(i)} \sim\textrm{tform}\left\{ \mathrm{N} \left(
+              \begin{bmatrix}
+\text{raw\_T0m\_ly}\\ 
+\text{raw\_mm\_y}
+\end{bmatrix}, \begin{bmatrix}
+\text{PCov\_1\_1} & \text{PCov\_2\_1}\\ 
+\text{PCov\_2\_1} & \text{PCov\_2\_2}
+\end{bmatrix} \right) \right\} \\\textrm{Initial latent states: }
+  &\underbrace{\begin{bmatrix}
+\text{ly}
+\end{bmatrix} 
+    \big{(}t_0\big{)}}_{\vect{\eta} (t_0)}	\sim \mathrm{N} \left(
+              \underbrace{
+        \begin{bmatrix}
+\text{T0m\_ly}
+\end{bmatrix}
+      }_{\underbrace{\vect{}}_\textrm{T0MEANS}},
+      \underbrace{covsdcor \left\{
+        \begin{bmatrix}
+0.01
+\end{bmatrix}\right\}
+      }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
+      \right) \\
+      \textrm{Deterministic change:}
   &\underbrace{\mathrm{d}
     \begin{bmatrix}
 \text{ly}
@@ -18,7 +49,7 @@
     \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
       \underbrace{
         \begin{bmatrix}
-\text{drift\_ly\_ly}
+\text{drift\_ly}
 \end{bmatrix}
       }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
         \begin{bmatrix}
@@ -30,29 +61,18 @@
 0
 \end{bmatrix}
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
-    & \qquad \qquad \quad cholsdcor\bigg(\underbrace{
+    \textrm{Random change: }
+    & \qquad \qquad \quad \underbrace{cholsdcor\left\{
       \begin{bmatrix}
-\text{diffusion\_ly\_ly}
-\end{bmatrix}
-    }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}\bigg)
+\text{diff\_ly}
+\end{bmatrix}\right\}
+    }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}
     \underbrace{\mathrm{d}
       \begin{bmatrix}
 W_{1}
 \end{bmatrix} 
       (t)}_{\mathrm{d} \vect{W}(t)} \\ \\
-          &\underbrace{
-            \begin{bmatrix}
-W_{1}
-\end{bmatrix}  
-            (t+u)}_{\vect{W}(t+u)} -   \underbrace{\begin{bmatrix}
-W_{1}
-\end{bmatrix}  
-            (t)}_{\vect{W}(t)} \sim  \mathrm{N} \left(
-              \begin{bmatrix}
-0
-\end{bmatrix}, \begin{bmatrix}
-\text{u-t}
-\end{bmatrix} \right) \\ \\
+              \textrm{Observations: }
 &\underbrace{
       \begin{bmatrix}
 \text{y}
@@ -69,7 +89,7 @@ W_{1}
           (t)}_{\vect{\eta}(t)} +
         \underbrace{
           \begin{bmatrix}
-\text{manifestmeans\_y}
+\text{mm\_y}
 \end{bmatrix} 
         }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
               \underbrace{
@@ -82,19 +102,15 @@ W_{1}
 \epsilon_{1}
 \end{bmatrix} 
           (t)}_{\vect{\epsilon}(t)} \\ \\
-          &\underbrace{
+                \textrm{Latent noise per time step : }
+          &\Delta \big[W_{j \in [1,1]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
+              \textrm{Observation noise: }
             \begin{bmatrix}
-\epsilon_{1}
+\epsilon_{j \in [1,1]}
 \end{bmatrix} 
-            (t)}_{\vect{\epsilon}(t)} \sim  \mathrm{N} \left(
-              \begin{bmatrix}
-0
-\end{bmatrix}
-              ,
-                \begin{bmatrix}
-1
-\end{bmatrix} \right) \\
-&\textrm{cholsdcor = Function converting lower tri matrix of std dev and unconstrained correlation to Cholesky factor.} \\ \\ 
+            (t) \sim  \mathrm{N}(0,1) \\ \\
+&cholsdcor\textrm{ converts lower tri matrix of std dev and unconstrained correlation to Cholesky factor covariance.} \\
+&covsdcor =\textrm{ transposed cross product of cholsdcor, to give covariance.} \\
 &\textrm{See Driver \& Voelkle (2018) p11.}
       \end{align*}
       \end{footnotesize}

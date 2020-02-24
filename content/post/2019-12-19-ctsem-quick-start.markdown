@@ -65,7 +65,7 @@ head(ssdat)
 
 
 # Model
-To fit a model using ctsem, the model is first specified using the ctModel function, then fit using the ctStanFit function. Free parameters are specified as strings, fixed values as numerics. Different slots of the matrices have different constraints by default, for DRIFT[2,1] we restrict the effect of sunspot level on sunspot velocity (parameter a21) to be negative by specifying a custom transformation in the 2nd slot, using the | symbol to separate slots.
+To fit a model using ctsem, the model is first specified using the ctModel function, then fit using the ctStanFit function. Free parameters are specified as strings, fixed values as numerics. Different slots of the matrices have different constraints by default, for DRIFT[2,1] we restrict the effect of sunspot level on sunspot velocity (parameter a21) to be negative by specifying a custom transformation in the 2nd slot, using the | symbol to separate slots. We also explicitly disallow any parameter variation across subjects, although since we have only 1 subject here this would have occurred anyway during fitting.
 
 ```r
 ssmodel <- ctModel(type='stanct',
@@ -76,10 +76,12 @@ ssmodel <- ctModel(type='stanct',
   'a21 | -log1p(exp(-param))-1e-5', 'a22'),
   MANIFESTMEANS=c('m1'),
   MANIFESTVAR=0,
-  T0VAR=1, #init variance, would have been fixed automatically since only 1 subject
+  T0VAR=diag(1,2), #init variance, would have been fixed automatically since only 1 subject
   CINT=0,
   DIFFUSION=c(0, 0,
   0, "diffusion"))
+
+ssmodel$pars$indvarying <- FALSE #set all parameters to fixed across subjects
   
 ctModelLatex(ssmodel)
 ```
@@ -133,7 +135,7 @@ To fit using a Bayesian approach, we need to pay more attention to our transform
 plot(ssmodel)
 ```
 
-<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" /><img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-2.png" width="672" />
+<img src="/post/2019-12-19-ctsem-quick-start_files/figure-html/plotmodel-1.png" width="672" />
 
 Even though we only have one subject for this case, the model doesn't know that until we fit it to data, and by default intercept style parameters are allowed to vary across subjects -- hence the blue and red plots showing possible distributions of subject parameters conditional on a mean of 1 standard deviation less or more.
 
