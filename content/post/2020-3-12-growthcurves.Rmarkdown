@@ -1,0 +1,186 @@
+---
+title: "Latent Growth Curves"
+author: Charles Driver
+date: '2020-3-12'
+slug: lgc
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-3-12T18:33:24+01:00'
+featured: no
+image:
+  caption: ''
+focal_point: ''
+preview_only: no
+projects: []
+---
+
+Latent growth curves are a nice, relatively straightforward model for estimating overall patterns of change from multiple, noisy, indicator variables. While the classic formulations of this model can be easily fit in most SEM packages, it provides a nice basis for understanding the differential equation formulation of systems, and also a good starting point for more complex model development not possible in the SEM framework -- as a peek into these possibilities I'll also show a growth curve model where the measurement error depends on the latent variable, as would be typical of floor or ceiling effects.
+
+To show this this I'll use ctsem. ctsem  is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. For a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE,results='hide')
+slug <- 'lgc'
+
+dir.create(slug)
+
+savedir <- normalizePath(paste0(getwd(),'/',slug))
+```
+
+# Data
+Lets load ctsem (if you haven't installed it see the quick start post!), and generate some data from a simple linear latent growth model. 
+
+```{r results='tidy'}
+set.seed(3)
+library(ctsem)
+
+nsubjects <- 10
+nobs <- 8 #number of obs
+intercept <- rnorm(nsubjects, 3,1) #random intercepts
+slope <- rnorm(nsubjects, 1, .5) - intercept * .1 #random slopes with intercept correlation
+dat <- data.frame(matrix(NA,nrow=nsubjects*nobs,ncol=3)) #empty dataframe
+colnames(dat) <- c('id','time','eta1')
+
+r<-0
+for(subi in 1:nsubjects){
+  for(obsi in 1:nobs){
+    r <- r+1 #current row
+    dat$time[r] <- obsi + runif(1,-.5,.5) #observation timing variation
+    dat$id[r] <- subi
+    dat$eta1[r] <- intercept[subi] + dat$time[r] * slope[subi] 
+  }
+}
+dat$y1 <- dat$eta1 + rnorm(nrow(dat),0,1) #observed variable with measurement error
+dat$id <- factor(dat$id)
+
+head(dat)
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(dat,aes(y=y1,x=time,colour=id))+geom_point()+
+  theme_bw()+geom_line(aes(y=eta1))
+```
+
+
+
+# Model
+The default model in ctsem is rather more flexible than linear growth, so we need to impose some restrictions on the dynamic system model, such that the change in the latent variable at any particular point does not depend on the current value of the latent variable, but only on the slope (or continuous time intercept) parameter. This continuous intercept parameter is fixed to zero by default, and instead measurement intercepts are estimated -- in this case we need to switch this. Since growth curve models also assume that changes in the latent variable are deterministic, we also need to restrict the system noise (diffusion) parameters to zero. In terms of individual differences, when multiple subjects are specified, the default is to have random (subject specific) initial states and intercepts (with correlation between the two), which is just fine for our current model. Since we have variation in the observation timing (both within and between subjects in this case) we need to use the continuous time, differential equation format. For growth curve models, the discrete time forms are exactly equivalent when the time between observations is 1, of whatever time unit is being used.
+```{r}
+model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
+  manifestNames='y',latentNames='ly',
+  T0VAR=.01, #only one subject, must fix starting variance
+  MANIFESTVAR=.2, #fixed measurement error, not easy to estimate with such limited data
+  LAMBDA=1) #Factor loading fixed to 1
+
+ctModelLatex(model) #requires latex install -- will prompt with instructions in any case
+```
+
+
+```{r TEX,echo=FALSE,fig.height=6}
+ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
+  filename = 'mdefaulttex',open=FALSE)
+
+library(magick) 
+tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
+
+plot(tiger)
+```
+
+Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
+```{r}
+fit<- ctStanFit(y, model, optimize=TRUE, nopriors=TRUE, cores=2)
+```
+
+Then we can use summary and plotting functions. Note the differences between the first plot, using the Kalman *filter* predictions for each point, where the model simply extrapolates forwards in time and has to make sudden updates as new information arrives, and the smoothed estimates, which are conditional on *all* time points in the data -- past, present, and future. These plots are based on the maximum likelihood estimate / posterior mean of the parameters. 
+```{r }
+summary(fit)
+
+kp<-ctKalman(fit,plot=TRUE, #predicted (conditioned on past time points) predictions.
+  kalmanvec=c('y','yprior'),timestep=.1)
+
+ks<-ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) latent states.
+  kalmanvec=c('y','ysmooth'),timestep=.1 )
+```
+
+We can modify the ggplot objects we created to include the data we dropped:
+```{r }
+library(ggplot2)
+kp= kp + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
+    Element='y',Time=ymissings$time), col='black')
+plot(kp)
+
+ks= ks + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
+    Element='y',Time=ymissings$time), col='black')
+plot(ks)
+
+```
+
+To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.) If we wanted more or different values to be available from such an approach, the easiest way is to include them as missing observations in the dataset used for fitting.
+```{r }
+k<-ctStanKalman(fit,collapsefunc = mean) 
+str(k$ysmooth) 
+k$ysmooth[1,missings,] 
+
+```
+
+
+<!-- We can also use the estimated mean and uncertainty to generate new data. For imputing purposes, we would generally want to account for uncertainty about the model parameters also, so we begin by creating mean and uncertainty estimates for random parameter vectors from our parameter distribution.  -->
+<!-- ```{r } -->
+
+<!-- imputed <- ctStanGenerateFromFit(fit,fullposterior=TRUE,imputemissings = TRUE,nsamples = 50) -->
+
+<!-- matplot(imputed$generated$Y[,,1],type='l') -->
+
+<!-- nsamples = 50 -->
+<!-- k <- ctStanKalman(fit = fit, nsamples = nsamples) -->
+
+<!-- matplot( t(k$ysmooth[,,1]), #selecting first manifest variable -->
+<!--   type='l',lty=1,col=rgb(1,0,0,.3)) -->
+<!-- ``` -->
+
+<!-- As expected from such little data, there is quite some variability in the expected trajectory due to parameter uncertainty. We would also expect variability in the uncertainty (ysmoothcov) though this is not visualised. -->
+
+<!-- For the next step, we randomly generate samples from our randomly drawn trajectories plus uncertainties. -->
+
+<!-- ```{r } -->
+<!-- newdat <-k$yprior -->
+<!-- for(sampi in 1:nsamples){ -->
+<!--   for(rowi in 1:length(k$time)){ -->
+<!--     newdat[sampi,rowi,] <- k$yprior[sampi,rowi,] + #mean estimate -->
+<!--       t(chol(k$ypriorcov[sampi,rowi,,])) %*% #plus Cholesky factor of cov matrix -->
+<!--       rnorm(dim(newdat)[3]) #multiplied by some standard normal samples -->
+<!--   } -->
+<!-- } -->
+<!-- matplot( t(k$ysmooth[,,1]), #plot expected trajectories -->
+<!--   type='l',lty=1,col=rgb(1,0,0,.3)) -->
+
+<!-- matplot(t(newdat[,,1]), #and sampled trajectories -->
+<!--   type='p',pch=1,col=rgb(0,0,1,.3),add=TRUE) -->
+
+<!-- ``` -->
+
+<!-- With this, we could select just our missing time points, leaving us with an nsamples by nmissingobs by nvariables array: -->
+
+<!-- ```{r } -->
+<!-- imputed <- newdat[,missings,,drop=FALSE] -->
+<!-- ``` -->
+
+<!-- For a sanity check, lets compare to the original plots: -->
+
+<!-- ```{r } -->
+<!-- library(plyr) -->
+<!-- newdf=adply(newdat,c(1,2,3)) #convert to data.frame -->
+<!-- newdf[,2] = as.numeric(newdf[,2]) -->
+<!-- colnames(newdf)[c(2,3,4)] <- c('Time','Element','Value') -->
+
+<!-- ks= ks + geom_point(data = newdf[newdf$Time %in% missings,], col='black',alpha=.3) -->
+<!-- plot(ks) -->
+
+<!-- ``` -->
+
