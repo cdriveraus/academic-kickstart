@@ -1,0 +1,109 @@
+---
+title: Restrictions on cross lagged effects (in discrete time) are (often) theoretically incoherent.
+author: Charles Driver
+date: '2020-2-12'
+slug: discretetimerestrictions
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-01-12T18:33:24+01:00'
+featured: no
+image:
+  caption: ''
+focal_point: ''
+preview_only: no
+projects: []
+---
+
+Multivariate longitudinal models where one variable is used to predict another at the next time step (e.g. cross-lagged panel models) have a long and 'colourful' history in social sciences. They offer a number of nice features, but many traps for the unwary. One such trap that appears not so widely understood is that when there are more than 2 variables involved, restricting the
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE,results='hide')
+slug <- 'discretetimerestrictions'
+
+dir.create(slug)
+
+savedir <- normalizePath(paste0(getwd(),'/',slug))
+```
+
+# Data
+Lets load ctsem (if you have not installed it see the quick start post!), and generate some data from a 3 dimensional discrete time model:
+
+```{r results='tidy'}
+set.seed(1)
+library(ctsem)
+
+n <- 40 #number of obs
+y <- matrix(NA,n,3)
+y[1,] <- c(3,5,2) #values at first time point
+DRIFT = matrix(c(
+  .9,0,.2,
+  0,.5, -.2,
+  -.4,.5,.8),byrow=TRUE,nrow=3,ncol=3)
+
+for(i in 2:n){
+  y[i,] = DRIFT %*% y[i-1,] + .1 #+ rnorm(3,0,.5) # ar * y + intercept + system noise
+}
+
+y=data.frame(y) #create a data.frame for ctsem
+y$id=1
+y$time=1:n
+
+head(y)
+```
+
+
+# Model
+The default model in ctsem is a first order auto / cross regressive style model, in either discrete or continuous time. There is correlated system noise, and uncorrelated measurement error. When multiple subjects are specified, the default is to have random (subject specific) initial states and measurement intercepts (with correlation between the two). For our purposes here, we're going to rely mostly on the defaults, and use a continuous time, differential equation format -- the discrete time form would also work fine for these purposes, but visualising the difference between the filter and smoother is much more obvious with the continuous time approach. Besides the defaults, we also fix the initial latent variance to a very low value (because we only have one subject), and the measurement error variance (because having system and measurement noise makes for better visuals but we can't easily estimate both with so little data).
+```{r}
+model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
+  manifestNames=c('X1','X2','X3'),
+  LAMBDA=diag(1,3), #simple diagonal factor loading matrix
+  T0VAR=diag(.01,3) #only one subject, must fix latent process initial covariance matrix
+  # DIFFUSION=0
+  # DIFFUSION = c( #system process noise covariance matrix
+  #   'd11',0,0,
+  #   0,'d22',0,
+  #   0,0,'d33'),
+  # MANIFESTVAR=0 #no measurement error here
+  )
+
+ctModelLatex(model) #requires latex install -- will prompt with instructions in any case
+```
+
+
+```{r TEX,echo=FALSE,fig.height=6}
+ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
+  filename = 'mdefaulttex',open=FALSE)
+
+library(magick)
+tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
+
+plot(tiger)
+```
+
+Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
+
+```{r}
+fit<- ctStanFit(y, model, optimize=TRUE, nopriors=TRUE, cores=2)
+```
+
+Then we can use summary and plotting functions. Note the differences between the first plot, using the Kalman *filter* predictions for each point, where the model simply extrapolates forwards in time and has to make sudden updates as new information arrives, and the smoothed estimates, which are conditional on *all* time points in the data -- past, present, and future. These plots are based on the maximum likelihood estimate / posterior mean of the parameters.
+```{r }
+ctKalman(fit,plot=T,kalmanvec=c('y','yprior'))
+s=summary(fit,timeinterval = 1)
+matrix(s$parmatrices[grep('dtDRIFT',rownames(s$parmatrices)),'50%'],3,3)
+DRIFT
+dtDIFFUSION <- diag(1,3)
+dtDIFFUSION[lower.tri(diag(3))] <- s$parmatrices[grep('dtDIFFUSION',rownames(s$parmatrices)),'50%'],3,3)
+DRIFT
+
+ctStanDiscretePars(fit,times = seq(0,10,.1),plot=TRUE,indices='CR')
+```
+
+
+ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. This is a super brief demo to show the basic intuition for Kalman filtering / smoother, and missing data imputation -- for a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+
+
