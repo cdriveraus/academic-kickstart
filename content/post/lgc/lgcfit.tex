@@ -15,100 +15,127 @@
   \begin{align*}
   \textrm{Subject parameter distribution: }
              &\underbrace{\begin{bmatrix}
-\text{T0m\_ly}_i\\ 
-\text{mm\_y}_i
+\text{int1}_i\\ 
+\text{int2}_i\\ 
+\text{slope1}_i\\ 
+\text{slope2}_i
 \end{bmatrix} 
-            }_{\vect{\phi}(i)} \sim\textrm{tform}\left\{ \mathrm{N} \left(
+            }_{\vect{\phi}(i)} \approx \mathrm{N} \left(
               \begin{bmatrix}
-\text{raw\_T0m\_ly}\\ 
-\text{raw\_mm\_y}
+2.867\\ 
+2.574\\ 
+0.275\\ 
+0.193
 \end{bmatrix}, \begin{bmatrix}
-\text{raw\_PCov\_1\_1} & \text{raw\_PCov\_2\_1}\\ 
-\text{raw\_PCov\_2\_1} & \text{raw\_PCov\_2\_2}
-\end{bmatrix} \right) \right\} \\\textrm{Initial latent states: }
+2.645 & 2.922 & 0.071 & 0.044\\ 
+2.922 & 3.315 & 0.058 & 0.014\\ 
+0.071 & 0.058 & 0.036 & 0.037\\ 
+0.044 & 0.014 & 0.037 & 0.045
+\end{bmatrix} \right)  \\\textrm{Initial latent states: }
   &\underbrace{\begin{bmatrix}
-\text{ly}
+\text{eta1}\\ 
+\text{eta2}
 \end{bmatrix} 
     \big{(}t_0\big{)}}_{\vect{\eta} (t_0)}	\sim \mathrm{N} \left(
               \underbrace{
         \begin{bmatrix}
-\text{T0m\_ly}
+2.867\\ 
+2.574
 \end{bmatrix}
       }_{\underbrace{\vect{}}_\textrm{T0MEANS}},
-      \underbrace{covsdcor \left\{
+      \underbrace{
         \begin{bmatrix}
-\text{Pcorsqrt\_1\_1}
-\end{bmatrix}\right\}
+2.645 & 2.922\\ 
+2.922 & 3.315
+\end{bmatrix}
       }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
       \right) \\
       \textrm{Deterministic change:}
   &\underbrace{\mathrm{d}
     \begin{bmatrix}
-\text{ly}
+\text{eta1}\\ 
+\text{eta2}
 \end{bmatrix} 
     \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
       \underbrace{
         \begin{bmatrix}
-\text{drift\_ly}
+0 & 0\\ 
+0 & 0
 \end{bmatrix}
       }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
         \begin{bmatrix}
-\text{ly}
+\text{eta1}\\ 
+\text{eta2}
 \end{bmatrix} 
         \big{(}t\big{)}
       }_{\vect{\eta} (t)}	+ \underbrace{
         \begin{bmatrix}
-0
+0.275\\ 
+0.193
 \end{bmatrix}
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
     \textrm{Random change: }
     & \qquad \qquad \quad \underbrace{cholsdcor\left\{
       \begin{bmatrix}
-\text{diff\_ly}
+0 & 0\\ 
+0 & 0
 \end{bmatrix}\right\}
     }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}
     \underbrace{\mathrm{d}
       \begin{bmatrix}
-W_{1}
+W_{1}\\ 
+W_{2}
 \end{bmatrix} 
       (t)}_{\mathrm{d} \vect{W}(t)} \\ \\
               \textrm{Observations: }
 &\underbrace{
       \begin{bmatrix}
-\text{y}
+\text{y1}\\ 
+\text{y2}\\ 
+\text{y3}
 \end{bmatrix}  
       (t)}_{\vect{Y}(t)} = 
         \underbrace{
           \begin{bmatrix}
-1
+1 & 0\\ 
+0 & 1\\ 
+0 & 0.969
 \end{bmatrix} 
         }_{\underbrace{\vect{\Lambda}}_\textrm{LAMBDA}} \underbrace{
           \begin{bmatrix}
-\text{ly}
+\text{eta1}\\ 
+\text{eta2}
 \end{bmatrix} 
           (t)}_{\vect{\eta}(t)} +
         \underbrace{
           \begin{bmatrix}
-\text{mm\_y}
+0\\ 
+0\\ 
+3.139
 \end{bmatrix} 
         }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
               \underbrace{
                 \begin{bmatrix}
-0.2
+0.207 & 0 & 0\\ 
+0 & 1.098 & 0\\ 
+0 & 0 & 0.538
 \end{bmatrix}  
               }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
               \underbrace{
           \begin{bmatrix}
-\epsilon_{1}
+\epsilon_{1}\\ 
+\epsilon_{2}\\ 
+\epsilon_{3}
 \end{bmatrix} 
           (t)}_{\vect{\epsilon}(t)} \\ \\
                 \textrm{Latent noise per time step : }
-          &\Delta \big[W_{j \in [1,1]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
+          &\Delta \big[W_{j \in [1,2]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
               \textrm{Observation noise: }
             \begin{bmatrix}
-\epsilon_{j \in [1,1]}
+\epsilon_{j \in [1,2]}
 \end{bmatrix} 
-            (t) \sim  \mathrm{N}(0,1) \\ \\
+            (t) \sim  \mathrm{N}(0,1) \\ \\&\textrm{Linearised approximation of subject parameter distribution shown.}\\
+            &\textrm{Indivividual specific notation (subscript i) only shown for subject parameter distribution -- pop. means shown elsewhere.} \\
 &cholsdcor\textrm{ converts lower tri matrix of std dev and unconstrained correlation to Cholesky factor covariance.} \\
 &covsdcor =\textrm{ transposed cross product of cholsdcor, to give covariance.} \\
 &\textrm{See Driver \& Voelkle (2018) p11.}

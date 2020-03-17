@@ -22,19 +22,13 @@ Latent growth curves are a nice, relatively straightforward model for estimating
 To show this this I'll use ctsem. ctsem  is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. For a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE,results='hide')
-slug <- 'lgc'
 
-dir.create(slug)
-
-savedir <- normalizePath(paste0(getwd(),'/',slug))
-```
 
 # Data
 Lets load ctsem (if you haven't installed it see the quick start post!), and generate some data from a simple linear latent growth model. 
 
-```{r results='tidy'}
+
+```r
 set.seed(3)
 library(ctsem)
 
@@ -58,20 +52,31 @@ dat$y1 <- dat$eta1 + rnorm(nrow(dat),0,.2) #observed variable with measurement e
 dat$id <- factor(dat$id)
 
 head(dat)
+##   id     time     eta1       y1
+## 1  1 1.216853 1.647280 1.711899
+## 2  1 2.322188 2.166084 1.988314
+## 3  1 3.320742 2.634769 2.713504
+## 4  1 3.699945 2.812753 2.860061
+## 5  1 5.101135 3.470421 3.384321
+## 6  1 5.929836 3.859382 3.749796
 ```
 
 
-```{r}
+
+```r
 library(ggplot2)
 ggplot(dat,aes(y=y1,x=time,colour=id))+geom_point()+
   theme_bw()+geom_line(aes(y=eta1))
 ```
 
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+
 
 
 # Model
 The default model in ctsem is rather more flexible than linear growth, so we need to impose some restrictions on the dynamic system model, such that the change in the latent variable at any particular point does not depend on the current value of the latent variable, but only on the slope (or continuous time intercept) parameter. This continuous intercept parameter is fixed to zero by default, and instead measurement intercepts are estimated -- in this case we need to switch this. Since growth curve models also assume that changes in the latent variable are deterministic, we also need to restrict the system noise (diffusion) parameters to zero. In terms of individual differences, when multiple subjects are specified, the default is to have random (subject specific) initial states and intercepts (with correlation between the two), which is just fine for our current model. Since we have variation in the observation timing (both within and between subjects in this case) we need to use the continuous time, differential equation format. For growth curve models, the discrete time forms are exactly equivalent to continuous time when the time between observations is 1, of whatever time unit is being used. 
-```{r}
+
+```r
 model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
   DRIFT=0,
   DIFFUSION=0,
@@ -84,65 +89,60 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 ```
 
 
-```{r TEX,echo=FALSE,fig.height=6}
-ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
-  filename = 'mdefaulttex',open=FALSE)
-
-library(magick) 
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
-
-plot(tiger)
-```
+<img src="/post/2020-3-12-growthcurves_files/figure-html/TEX-1.png" width="672" />
 
 # Fit
 Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
-```{r}
+
+```r
 fit<- ctStanFit(dat, model, optimize=TRUE, nopriors=TRUE, cores=2) 
 ```
 
 # Summarise / Visualise
 Then we can use various summary and plotting functions:
 
-```{r}
+
+```r
 ctModelLatex(fit) #requires latex install -- will prompt with instructions in any case
 ```
 
-```{r TEXfit,echo=FALSE,fig.height=6}
-ctModelLatex(fit,textsize = 'footnotesize', folder=savedir,
-  filename = 'lgcfit',open=FALSE)
-
-library(magick) 
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/lgcfit.pdf'),density = 300))
-
-plot(tiger)
-```
+<img src="/post/2020-3-12-growthcurves_files/figure-html/TEXfit-1.png" width="672" />
 
 
-```{r }
+
+```r
 summary(fit)
 
 ctKalman(fit,plot=TRUE, #predicted (conditioned on past time points) observation values.
   kalmanvec=c('y','yprior'),
   subjects=1:3, timestep=.1) 
+```
+
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+
+```r
 
 ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) observation values.
   kalmanvec=c('y','ysmooth'),subjects=1:3,timestep=.1 )
-
 ```
+
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-6-2.png" width="672" />
 Note the differences between the first plot, using the Kalman *filter* predictions for each point, where the model simply extrapolates forwards in time and has to make sudden updates as new information arrives, and the smoothed estimates, which are conditional on *all* time points in the data -- past, present, and future. In the first plot, it's possible to see the system slowly learning the intercept and slope parameters as more data arrives, and in the second, we see the corrections to the predictions based on the knowledge given by all the observations. These plots are based on the maximum likelihood estimate / posterior mean of the parameters. 
 
 # Multivariate
 Let's look at a case with 2 latent processes, one of which has multiple indicators.
 
 First, we generate some new data:
-```{r}
+
+```r
 dat$eta2 <- dat$eta1 - .1*dat$time + rnorm(nrow(dat),0,.5)
 dat$y2 <- dat$eta2 + rnorm(nrow(dat))
 dat$y3 <- dat$eta2 + rnorm(nrow(dat),0,.2) + 3
 ```
 
 Our new model looks like:
-```{r}
+
+```r
 model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
   DRIFT=0, #change doesn't depend on latent state
   DIFFUSION=0, #no random change in latent state
@@ -163,54 +163,47 @@ ctModelLatex(model,linearise = TRUE) #requires latex install -- will prompt with
 
 In this case, the ctsem default of correlated individual differences for all intercept style parameters is more relaxed than we want (though there may be good reasons for allowing individual differences here!) and we have used the separator \code{|} notation to turn off individual variation on the manifest intercept parameter. 
 
-```{r TEX2,echo=FALSE,fig.height=6}
-ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
-  filename = 'mdefaulttex',open=FALSE)
-
-library(magick) 
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
-
-plot(tiger)
-```
+<img src="/post/2020-3-12-growthcurves_files/figure-html/TEX2-1.png" width="672" />
 
 We fit the new model to the data...
-```{r}
+
+```r
 fit<- ctStanFit(dat, model, optimize=TRUE, nopriors=TRUE, cores=2) 
 ```
 
 and take a look at our new results:
-```{r}
+
+```r
 ctModelLatex(fit) #requires latex install -- will prompt with instructions in any case
 ```
 
-```{r,echo=FALSE,fig.height=6}
-ctModelLatex(fit,textsize = 'footnotesize', folder=savedir,
-  filename = 'lgcfit',open=FALSE)
-
-library(magick) 
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/lgcfit.pdf'),density = 300))
-
-plot(tiger)
-```
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-11-1.png" width="672" />
 
 
-```{r}
+
+```r
 ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) predictions.
   kalmanvec=c('y','ysmooth'),subjects=1:2,timestep=.1 ) 
 ```
+
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-12-1.png" width="672" />
 
 # State dependent measurement error
 
 Ok, now let's consider something that regular SEM can't handle. What if our measurement instruments only work well for certain values of the latent variable?
 
-```{r}
+
+```r
 dat$y1 <- dat$eta1 + 
   rnorm(nrow(dat),0, log1p(exp(.8*dat$eta1-3))) #add some state dependent noise
 plot(dat$eta1,log1p(exp(.8*dat$eta1-3))) #plot measurement error sd against latent
 ```
 
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-13-1.png" width="672" />
 
-```{r}
+
+
+```r
 model <- ctModel(type='stanct', 
   DRIFT=0,
   DIFFUSION=0,
@@ -227,21 +220,17 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 ```
 
 
-```{r,echo=FALSE,fig.height=6}
-ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
-  filename = 'mdefaulttex',open=FALSE)
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-15-1.png" width="672" />
 
-library(magick) 
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
 
-plot(tiger)
-```
-
-```{r}
+```r
 fit<- ctStanFit(dat, model, optimize=TRUE, nopriors=TRUE,cores=2)
 ```
 
-```{r }
+
+```r
 k=ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) observation values.
   kalmanvec=c('y','ysmooth'),subjects=c(3,4))
 ```
+
+<img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-17-1.png" width="672" />
