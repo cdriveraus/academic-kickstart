@@ -1,20 +1,13 @@
 ---
-title: "Latent growth curves, state dependent error."
+title: Latent growth curves, state dependent error.
 author: Charles Driver
-date: '2020-3-12'
+date: '2020-03-14'
 slug: lgc
-categories: []
-tags: []
-subtitle: ''
-summary: ''
-authors: []
-lastmod: '2020-3-12T18:33:24+01:00'
+lastmod: 2020-3-12T18:33:24+01:00
 featured: no
 image:
   caption: ''
-focal_point: ''
 preview_only: no
-projects: []
 ---
 
 Latent growth curves are a nice, relatively straightforward model for estimating overall patterns of change from multiple, noisy, indicator variables. While the classic formulations of this model can be easily fit in most SEM packages, it provides a nice basis for understanding the differential equation formulation of systems, and also a good starting point for more complex model development not possible in the SEM framework -- as a peek into these possibilities I'll also show a growth curve model where the measurement error depends on the latent variable, as would be typical of floor or ceiling effects.
