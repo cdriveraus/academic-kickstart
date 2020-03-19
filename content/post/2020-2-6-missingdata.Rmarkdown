@@ -63,7 +63,7 @@ model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
   T0VAR=.01, #only one subject, must fix starting variance
   MANIFESTVAR=.2, #fixed measurement error, not easy to estimate with such limited data
   LAMBDA=1) #Factor loading fixed to 1
-
+ 
 ctModelLatex(model) #requires latex install -- will prompt with instructions in any case
 ```
 
@@ -71,7 +71,7 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 ```{r TEX,echo=FALSE,fig.height=6}
 ctModelLatex(model,textsize = 'footnotesize', folder=savedir,
   filename = 'mdefaulttex',open=FALSE)
-
+ 
 library(magick) 
 tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
 

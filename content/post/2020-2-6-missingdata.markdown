@@ -65,12 +65,12 @@ model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
   T0VAR=.01, #only one subject, must fix starting variance
   MANIFESTVAR=.2, #fixed measurement error, not easy to estimate with such limited data
   LAMBDA=1) #Factor loading fixed to 1
-
+ 
 ctModelLatex(model) #requires latex install -- will prompt with instructions in any case
 ```
 
 
-<img src="/post/2020-2-6-missingdata_files/figure-html/TEX-1.png" width="672" />
+<img src="2020-2-6-missingdata_files/figure-html/TEX-1.png" width="672" />
 
 Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
 
@@ -87,7 +87,7 @@ kp<-ctKalman(fit,plot=TRUE, #predicted (conditioned on past time points) predict
   kalmanvec=c('y','yprior'),timestep=.1)
 ```
 
-<img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+<img src="2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 
 ```r
 
@@ -95,7 +95,7 @@ ks<-ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) latent st
   kalmanvec=c('y','ysmooth'),timestep=.1 )
 ```
 
-<img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-2.png" width="672" />
+<img src="2020-2-6-missingdata_files/figure-html/unnamed-chunk-4-2.png" width="672" />
 
 We can modify the ggplot objects we created to include the data we dropped:
 
@@ -106,7 +106,7 @@ kp= kp + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
 plot(kp)
 ```
 
-<img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<img src="2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
 ```r
 
@@ -115,7 +115,7 @@ ks= ks + geom_point(data = data.frame(Variable='y', Value=ymissings$y,
 plot(ks)
 ```
 
-<img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-2.png" width="672" />
+<img src="2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
 To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.) If we wanted more or different values to be available from such an approach, the easiest way is to include them as missing observations in the dataset used for fitting.
 
