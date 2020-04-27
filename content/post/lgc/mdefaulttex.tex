@@ -13,7 +13,7 @@
  \begin{footnotesize}
  \setcounter{MaxMatrixCols}{200}
   \begin{align*}
-  \textrm{Subject parameter distribution: }
+  \parbox{10em}{\centering{Subject\linebreak parameter\linebreak distribution:}}
              &\underbrace{\begin{bmatrix}
 \text{T0m\_eta1}_i\\ 
 \text{slope}_i
@@ -23,9 +23,9 @@
 \text{raw\_T0m\_eta1}\\ 
 \text{raw\_slope}
 \end{bmatrix}, \begin{bmatrix}
-\text{raw\_PCov\_1\_1} & \text{raw\_PCov\_2\_1}\\ 
-\text{raw\_PCov\_2\_1} & \text{raw\_PCov\_2\_2}
-\end{bmatrix} \right) \right\} \\\textrm{Initial latent states: }
+\text{rawPCov\_1\_1} & \text{rawPCov\_2\_1}\\ 
+\text{rawPCov\_2\_1} & \text{rawPCov\_2\_2}
+\end{bmatrix} \right) \right\} \\\parbox{10em}{\centering{Initial\linebreak latent\linebreak state:}}
   &\underbrace{\begin{bmatrix}
 \text{eta1}
 \end{bmatrix} 
@@ -41,7 +41,7 @@
 \end{bmatrix}\right\}
       }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
       \right) \\
-      \textrm{Deterministic change:}
+      \parbox{10em}{\centering{Deterministic\linebreak change:}}
   &\underbrace{\mathrm{d}
     \begin{bmatrix}
 \text{eta1}
@@ -61,7 +61,7 @@
 \text{slope}
 \end{bmatrix}
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
-    \textrm{Random change: }
+    \parbox{10em}{\centering{Random\linebreak change:}}
     & \qquad \qquad \quad \underbrace{cholsdcor\left\{
       \begin{bmatrix}
 0
@@ -94,7 +94,7 @@ W_{1}
         }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
               \underbrace{
                 \begin{bmatrix}
-\text{log1p(exp(errorsd\_intercept + errorsd\_byeta1 * eta1))}
+\text{log1p\_exp(errorsd\_intercept + errorsd\_byeta1 * eta1)}
 \end{bmatrix}  
               }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
               \underbrace{
@@ -102,9 +102,9 @@ W_{1}
 \epsilon_{1}
 \end{bmatrix} 
           (t)}_{\vect{\epsilon}(t)} \\ \\
-                \textrm{Latent noise per time step : }
+                \parbox{10em}{\centering{Latent noise\linebreak per time step:}}
           &\Delta \big[W_{j \in [1,1]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
-              \textrm{Observation noise: }
+              \parbox{10em}{\centering{Observation\linebreak noise:}}
             \begin{bmatrix}
 \epsilon_{j \in [1,1]}
 \end{bmatrix} 

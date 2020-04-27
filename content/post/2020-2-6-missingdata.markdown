@@ -17,7 +17,7 @@ preview_only: no
 projects: []
 ---
 
-  ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. This is a super brief demo to show the basic intuition for Kalman filtering / smoother, and missing data imputation -- for a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+  ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. This is a super brief demo to show the basic intuition for Kalman filtering / smoother, and missing data imputation -- for a quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
 
 
 
@@ -72,7 +72,7 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/TEX-1.png" width="672" />
 
-Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
+Fit using optimization and maximum likelihood:
 
 ```r
 fit<- ctStanFit(y, model, optimize=TRUE, nopriors=TRUE, cores=2)
@@ -117,7 +117,7 @@ plot(ks)
 
 <img src="/post/2020-2-6-missingdata_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
-To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC.) If we wanted more or different values to be available from such an approach, the easiest way is to include them as missing observations in the dataset used for fitting.
+To access the imputed, smoothed values without plotting directly, we use the mean of our parameter samples to calculate various state and observation expectations using the ctStanKalman function. (In this case the samples are based on the Hessian at the max likelihood, but they could potentially come via importance sampling or Stan's dynamic HMC if we used different fitting options.) If we wanted more or different values to be available from such an approach, the easiest way is to include them as missing observations in the dataset used for fitting.
 
 ```r
 k<-ctStanKalman(fit,collapsefunc = mean) 

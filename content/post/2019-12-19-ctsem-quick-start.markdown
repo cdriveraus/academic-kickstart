@@ -29,7 +29,7 @@ Within R, for the CRAN version of ctsem simply run:
 install.packages('ctsem') 
 ```
 
-Or for the github version, with additional setup for stan that may be useful if stan is not installed:
+Or for the github version, with extra setup for stan that may be useful if stan is not installed:
 
 
 ```r
@@ -81,7 +81,7 @@ ssmodel <- ctModel(type='stanct',
   DIFFUSION=c(0, 0,
   0, "diffusion"))
 
-ssmodel$pars$indvarying <- FALSE #set all parameters to fixed across subjects
+ssmodel$pars$indvarying <- FALSE #set all pars to fixed across subjects (also automatic in this case)
   
 ctModelLatex(ssmodel)
 ```
@@ -92,7 +92,7 @@ ctModelLatex(ssmodel)
 Fit using maximum likelihood:
 
 ```r
-ssfit <- ctStanFit(ssdat, ssmodel, optimize=TRUE, cores=2)
+ssfit <- ctStanFit(ssdat, ssmodel, cores=2)
 ```
 
 Then we can use summary and plotting functions:
@@ -152,7 +152,7 @@ ssmodel <- ctModel(type='stanct',
   'a21 | -log1p(exp(-param))-1e-5','a22'),
   MANIFESTMEANS=c('m1|param*10+44'),
   MANIFESTVAR='merror',
-  T0VAR=1e-3, #this would have been set automatically since only 1 subject
+  T0VAR=diag(1e-3,2), #this would have been set automatically since only 1 subject
   CINT=0,
   DIFFUSION=c(0, 0,
   0, "diffusion"))
@@ -185,7 +185,8 @@ ggplot(data=ssdat,mapping = aes(y=sunspots,x=time)) +
 Since this doesn't look obviously unreasonable, we'll go ahead and fit using Stan's Hamiltonian Monte Carlo and plot the posterior distributions of parameters:
 
 ```r
-ssfit <- ctStanFit(ssdat, ssmodel, iter=300, chains=2, cores=2)
+ssfit <- ctStanFit(ssdat, ssmodel, 
+  iter=300, chains=2, cores=2,optimize=FALSE,nopriors=FALSE)
 
 ctStanPlotPost(ssfit)
 ```

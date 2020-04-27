@@ -12,12 +12,12 @@ preview_only: no
 
 Latent growth curves are a nice, relatively straightforward model for estimating overall patterns of change from multiple, noisy, indicator variables. While the classic formulations of this model can be easily fit in most SEM packages, it provides a nice basis for understanding the differential equation formulation of systems, and also a good starting point for more complex model development not possible in the SEM framework -- as a peek into these possibilities I'll also show a growth curve model where the measurement error depends on the latent variable, as would be typical of floor or ceiling effects.
 
-To show this I'll use ctsem. ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible non-linearities (ie state / time dependence) in the parameters. For a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
+To show this I'll use ctsem. ctsem is R software for statistical modelling using hierarchical state space models, of discrete or continuous time formulations, with possible nonlinearities (ie state / time dependence) in the parameters. For a general quick start see https://cdriver.netlify.com/post/ctsem-quick-start/ , and for more details see the current manual at https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf
 
 
 
 
-# Data
+# Data 
 Lets load ctsem (if you haven't installed it see the quick start post!), and generate some data from a simple linear latent growth model. 
 
 
@@ -85,10 +85,10 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 <img src="/post/2020-3-12-growthcurves_files/figure-html/TEX-1.png" width="672" />
 
 # Fit
-Fit using optimization and maximum likelihood (Possibly a couple of spurious warnings while estimating Hessian -- fixed on github):
+Fit using optimization and maximum likelihood (defaults as of v2.2.1):
 
 ```r
-fit<- ctStanFit(dat, model, optimize=TRUE, nopriors=TRUE, cores=2) 
+fit<- ctStanFit(dat, model, cores=2) 
 ```
 
 # Summarise / Visualise
@@ -154,7 +154,7 @@ model <- ctModel(type='stanct', # use 'standt' for a discrete time setup
 ctModelLatex(model,linearise = TRUE) #requires latex install -- will prompt with instructions in any case
 ```
 
-In this case, the ctsem default of correlated individual differences for all intercept style parameters is more relaxed than we want (though there may be good reasons for allowing individual differences here!) and we have used the separator \code{|} notation to turn off individual variation on the manifest intercept parameter. 
+In this case, the ctsem default of correlated individual differences for all intercept style parameters is more relaxed than we want (though there may be good reasons for allowing individual differences here!) and we have used the separator | notation to turn off individual variation on the manifest intercept parameter. 
 
 <img src="/post/2020-3-12-growthcurves_files/figure-html/TEX2-1.png" width="672" />
 
@@ -185,6 +185,8 @@ ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) predictions.
 
 Ok, now let's consider something that regular SEM can't handle. What if our measurement instruments only work well for certain values of the latent variable?
 
+Modify the data so measurement error depends on the latent state, eta.
+
 
 ```r
 dat$y1 <- dat$eta1 + 
@@ -194,7 +196,7 @@ plot(dat$eta1,log1p(exp(.8*dat$eta1-3))) #plot measurement error sd against late
 
 <img src="/post/2020-3-12-growthcurves_files/figure-html/unnamed-chunk-13-1.png" width="672" />
 
-
+Include a dependency on eta1 in the MANIFESTVAR (measurement error) matrix, ensuring the results is always positive by using the log1p_exp (softplus) function, and making sure ctsem knows which are the free parameters in the complex parameter construction.
 
 ```r
 model <- ctModel(type='stanct', 
@@ -204,7 +206,7 @@ model <- ctModel(type='stanct',
   MANIFESTMEANS=0,
   manifestNames='y1',latentNames='eta1',
   LAMBDA=1,
-  MANIFESTVAR='log1p(exp(errorsd_intercept + errorsd_byeta1 * eta1))', #complex sd parameter
+  MANIFESTVAR='log1p_exp(errorsd_intercept + errorsd_byeta1 * eta1)', #complex sd parameter
   PARS=c('errorsd_intercept', 
     'errorsd_byeta1') #specify any free parameters within complex parameters
 )
@@ -217,9 +219,10 @@ ctModelLatex(model) #requires latex install -- will prompt with instructions in 
 
 
 ```r
-fit<- ctStanFit(dat, model, optimize=TRUE, nopriors=TRUE,cores=2)
+fit<- ctStanFit(dat, model)
 ```
 
+Now we can see that when the process has lower values, we are more certain about the model predictions because of reduced measurement error.
 
 ```r
 k=ctKalman(fit,plot=TRUE, #smoothed (conditioned on all time points) observation values.
