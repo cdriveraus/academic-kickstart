@@ -1,0 +1,152 @@
+---
+title: Dynamic Systems in Psychology
+author: Charles Driver
+date: '2020-07-14'
+slug: DynSysIntro
+lastmod: 2020-7-14T18:33:24+01:00
+featured: no
+image:
+  caption: ''
+preview_only: no
+---
+
+
+
+
+
+What is a dynamic system? Why are they interesting? How do we take bits of the bumbling buzzing confusion around us and pack them into a statistical model of change to make nuanced predictions and test interesting hypotheses about 'stuff that happens' so we can better adjust the buzzing confusion to our tastes? For some of my opinion, read on...
+
+Precise definitions can be troublesome, but in general most things psychologists are interested in can be thought of as dynamic systems, but often just a single instant in the time course of the system is focused on, using cross-sectional data.
+
+### Simplest model of change / 'dynamics'? Probably a t-test!
+
+* Does ice cream make people happy?
+  + 2 groups, experimental and control.
+  + Give experimental group ice cream.
+  + Ask about happiness.
+
+<img src="/img/icecream2.jpg" width="60%" style="display: block; margin: auto;" />
+
+Such an experiment can give us a precise estimate of the average effect on measured happiness (i.e. some kind of affect / satisfaction / wellbeing variable) for the sample, in a specific context, a specific length of time after the 'treatment'. On it's own, this piece of knowledge is useless, as the context is unlikely to be exactly repeated, and anyway being happier at one brief moment when answering a survey question is not very useful. Only under assumptions of some kind of smoothness and regularity in the universe does such knowledge become useful -- we can start to think that *similar* people, in *similar* circumstances, may exhibit *similar* effects. Such assumptions of regularity are necessary for any form of knowledge and we are so familiar with such generalisation processes that we often don't notice -- but a critical part of this process is at least having a rough estimate of how far we can generalise. Psychology has a colourful history of cute studies, neat p values and vague / implicit assumptions leading to apparently profound effects that are not so profound in reality. To properly consider the usefulness of ice cream as a happiness treatment, or to leverage the ice cream treatment to better understand wellbeing constructs, we need to embed this new knowledge in the broader system we're interested in.
+
+
+##### Perhaps a little more nuance is needed? 
+
+  + *When* do people become happier?
+  
+  + For how *long*?
+  
+  + What does happy really *mean* in this case? (e.g. what might the corresponding up or downstream effects look like?)
+  
+  + Does the effect change with temperature, flavour, amount, age,...?
+
+Once we add in a few extra pieces, we start to get more interesting models that can tell us what may happen in a broader range of circumstances, and allow new knowledge to be embedded more easily... something like this maybe?
+
+<img src="/img/climatescienceplan.jpg" width="90%" style="display: block; margin: auto;" />
+
+* Ok, in most cases psychology is still a long from such models. But it's a nice visual representation of a serious dynamic system model -- multiple interacting factors that each play a role in how all the other bits change. Moving slowly in such a direction would represent useful progress, I think. 
+
+---
+### Different levels of explanation.
+Fundamental to model building is to address concerns at an appropriate level. While it is not always straightforward to determine what this level should be, and this may change over time with changing knowledge, I'd suggest that scientific constructs do useful work when either: They represent (at least approximately) something we care about in and of itself, as for instance with things like satisfaction, hunger, pain; or they fit somewhere in our tangled web of knowledge, eventually connecting to things we care about. If we're interested in the feeling of wellbeing and comfort provided by physical contact with a loved one, we could conceivably model this (some time in the future!) based on an *extremely* large model involving fundamental particles, but including higher level constructs like 'people' will likely offer a much more tractable model, easier to understand and develop further. Perhaps at some level of model richness, brain structures become useful, as do perhaps social conditions. 
+
+Another aspect of the 'level' of a construct is that of the time scale -- quite some debate occurred as to whether short term transient states like a sunny day influenced measures of wellbeing. One way out of such worries is to acknowledge that yes, there are likely to be a range of short term influences on answers to wellbeing related questions, but most such things can also be treated as some form of measurement error / noise when the interest is on the year or decade time scale. If the interest was more on the hourly time scale, then fluctuations at one hour likely *are* informative for the next hour, so they shouldn't be treated as measurement error.
+
+This diagram from Lindenberger, Li, & Bäckman, (2006), neatly demonstrates both the short vs long timescale, and high vs low construct level, for typical cases in developmental psychology / neuroscience.
+
+<img src="/img/brainbehaviourenvironment.jpg" width="65%" style="display: block; margin: auto;" />
+
+### Example uses?
+
+* Non psychology:
+
+ + Weather and climate
+ 
+ + Finance
+ 
+ + Landing on the moon
+ 
+ + What happens when we shine two lasers at each other?
+ 
+ 
+<img src="/img/filter.jpg" width="105%" style="display: block; margin: auto;" />
+
+
+
+### Example uses - Psychology
+* Decision making
+<img src="/img/ddm.jpg" width="105%" style="display: block; margin: auto;" />
+
+
+
+##### Psychopathology networks
+<img src="/img/networks.png" width="90%" style="display: block; margin: auto;" />
+
+
+
+* Long history of thinking in a dynamic systems framework...
+
+* But limited serious applications - probably due to data scarcity, computational difficulty, training...
+
+* Possibilities growing rapidly with explosion of data in recent years.
+
+
+### Couldn't we stick to simple models?
+
+* Yes! If...
+ 
+ + we are willing to run a new experiment whenever we want to know something slightly different.
+ 
+ + or we don't care about accuracy / validity.
+ 
+
+
+
+# Predictions forward in time
+<img src="/img/corona1part.jpg" width="80%" style="display: block; margin: auto;" />
+
+
+# Predictions forward in time
+<img src="/img/corona5part.jpg" width="80%" style="display: block; margin: auto;" />
+
+
+# Predictions forward in time
+<img src="/img/corona5full.jpg" width="80%" style="display: block; margin: auto;" />
+
+
+#Heirarchy of Knowledge Representations
+
+* Verbal, loosely specified / vague.
+
+* Schematic.
+
+* Mathematical: 
+ + From: Low fidelity and high uncertainty.
+ 
+ + To: high fidelity and low uncertainty. 
+ 
+* Benefits of each?
+
+
+#Statistical modelling
+
+* Model is approx. a core theory / idea + some extra assumptions.
+
+* Core idea: Intelligence is composed of multiple facets that tend to take on similar values.
+
+* Extra assumptions: Factor analysis -- linear relationships, Gaussian errors. 
+
+* Model fit -- match between estimated model and reality.
+
+<img src="/img/g.jpg" width="80%" style="display: block; margin: auto;" />
+
+
+
+#Statistical modelling -- what are we doing?
+* We want to see how a little piece of the world works.
+* Test / quantify this piece.
+* Iterate from hand waving to specific predictions re size, time, context.
+* Requires overall 'measurement' plan -- what do we look at, how do we quantify? 
+* Model/s -- which aspects of theory space do we cover, how do we relate the information within?
+* How large / unified should our models be? Depends!
+![](/img/theoryspace2.png)<!-- -->![](/img/theoryspace3.png)<!-- -->

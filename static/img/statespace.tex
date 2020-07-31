@@ -1,0 +1,96 @@
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\geometry{paperwidth=\maxdimen,paperheight=\maxdimen,margin=1cm}
+
+\usepackage[fleqn]{amsmath} %for multiple line equations
+\usepackage[active,tightpage,displaymath]{preview}
+\usepackage{bm}
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}}
+
+\begin{document}
+\pagenumbering{gobble}
+ \begin{normalsize}
+ \setcounter{MaxMatrixCols}{200}
+  \begin{align*}
+      \parbox{10em}{\centering{Deterministic\linebreak change:}}
+  &\underbrace{\mathrm{d}
+    \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+    \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
+      \underbrace{
+        \begin{bmatrix}
+-1 & 0.5\\ 
+0 & -1
+\end{bmatrix}
+      }_{{\vect{A}}} \underbrace{
+        \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+        \big{(}t\big{)}
+      }_{\vect{\eta} (t)}	+ \underbrace{
+        \begin{bmatrix}
+0\\ 
+0
+\end{bmatrix}
+      }_{{\vect{b}}}\right) \mathrm{d}t +
+   \underbrace{\left\{
+      \begin{bmatrix}
+1 & 0\\ 
+0 & 1
+\end{bmatrix}\right\}
+    }_{{\vect{G}}}
+    \underbrace{\mathrm{d}
+      \begin{bmatrix}
+W_{1}\\ 
+W_{2}
+\end{bmatrix} 
+      (t)}_{\mathrm{d} \vect{W}(t)} \\ \\
+              \textrm{Observations: }
+&\underbrace{
+      \begin{bmatrix}
+\text{Y1}\\ 
+\text{Y2}
+\end{bmatrix}  
+      (t)}_{\vect{Y}(t)} = 
+        \underbrace{
+          \begin{bmatrix}
+1 & 0\\ 
+0 & 1
+\end{bmatrix} 
+        }_{{\vect{\Lambda}}} \underbrace{
+          \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+          (t)}_{\vect{\eta}(t)} +
+        \underbrace{
+          \begin{bmatrix}
+\text{mm\_Y1}\\ 
+\text{mm\_Y2}
+\end{bmatrix} 
+        }_{{\vect{\tau}}} + 
+              \underbrace{
+                \begin{bmatrix}
+0.1 & 0\\ 
+0 & 0.1
+\end{bmatrix}  
+              }_{{\vect{\Theta}}}
+              \underbrace{
+          \begin{bmatrix}
+\epsilon_{1}\\ 
+\epsilon_{2}
+\end{bmatrix} 
+          (t)}_{\vect{\epsilon}(t)} \\ \\
+                \parbox{10em}{\centering{Latent noise\linebreak per time step:}}
+          &\Delta \big[W_{j \in [1,2]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
+              \parbox{10em}{\centering{Observation\linebreak noise:}}
+            \begin{bmatrix}
+\epsilon_{j \in [1,2]}
+\end{bmatrix} 
+            (t) \sim  \mathrm{N}(0,1) \\ \\
+      \end{align*}
+      \end{normalsize}
+      \end{document}
