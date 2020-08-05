@@ -2,11 +2,11 @@
 title: Dynamic Systems Modeling in Psychology
 author: Charles Driver
 date: '2020-07-14'
-slug: DynSysIntro
+slug: IntroToDynamics
 lastmod: 2020-7-14T18:33:24+01:00
 featured: no
 image:
-caption: ''
+  caption: ''
 preview_only: no
 ---
 
@@ -56,9 +56,10 @@ Once we add in a few extra pieces, we start to get more interesting models that 
 include_graphics('/img/climatescienceplan.jpg')
 ```
 
-* Ok, in most cases psychology is still a long from such models. But it's a nice visual representation of a serious dynamic system model -- multiple interacting factors that each play a role in how all the other bits change. Moving slowly in such a direction would represent useful progress, I think. 
+* Ok, in most cases psychology is still a long from such models. But it's a nice visual representation of a serious dynamic system model - multiple interacting factors that each play a role in how all the other bits change. Moving slowly in such a direction would represent useful progress, I think. 
 
 ---
+
 ### Different levels of explanation.
 Fundamental to model building is to address concerns at an appropriate level. While it is not always straightforward to determine what this level should be, and this may change over time with changing knowledge, I'd suggest that scientific constructs do useful work when either: They represent (at least approximately) something we care about in and of itself, as for instance with things like satisfaction, hunger, pain; or they fit somewhere in our tangled web of knowledge, eventually connecting to things we care about. If we're interested in the feeling of wellbeing and comfort provided by physical contact with a loved one, we could conceivably model this (some time in the future!) based on an *extremely* large model involving fundamental particles, but including higher level constructs like 'people' will likely offer a much more tractable model, easier to understand and develop further. Perhaps at some level of model richness, brain structures become useful, as do perhaps social conditions. 
 
@@ -71,15 +72,16 @@ include_graphics('/img/brainbehaviourenvironment.jpg')
 ```
 
 ---
+
 ### Dynamic systems example uses - non psychology:
 
- + Weather and climate
+* Weather and climate
+
+* Finance
+
+* Landing on the moon
  
- + Finance
- 
- + Landing on the moon
- 
- + What happens when we shine two lasers at each other?
+* What happens when we shine two lasers at each other?
  
  
 ```{r, echo=F,out.width='105%', fig.align='center'}
@@ -121,14 +123,14 @@ include_graphics('/img/corona1part.jpg')
 ```
 
 
-* But in psychology, given that there are always similarities between people (compared to say, a block of cheese), we can also leverage knowledge from how other subjects behave -- we are probably more confident of where the red line will go now.
+* But in psychology, given that there are always similarities between people (compared to say, a person and a block of cheese), we can also leverage knowledge of how other subjects behave -- in this case we are probably more confident of where the red line will go now.
 ```{r, echo=F,out.width='80%', fig.align='center'}
 include_graphics('/img/corona5part.jpg')
 ```
 
 
 * Such knowledge of other subjects behaviour, and a specific subjects past, can lead to improved predictions of the future.
-```{r, echo=F,out.width='80%', fig.align='center'}
+```{r, echo=F,out.width='30%', fig.align='center'}
 include_graphics('/img/corona5full.jpg')
 ```
 
@@ -137,7 +139,7 @@ include_graphics('/img/corona5full.jpg')
 
 ### Statistical modelling
 
-* Model is approx. a core theory / idea + some extra assumptions.
+* Model is approx. a core theory / idea + some extra assumptions. 
 
 * Core idea: Intelligence is composed of multiple facets that tend to take on similar values.
 
@@ -145,10 +147,11 @@ include_graphics('/img/corona5full.jpg')
 
 * Model fit -- match between estimated model and reality.
 
-```{r, echo=F,out.width='80%', fig.align='center'}
-include_graphics('/img/g.jpg')
-```
+```{r, echo=F, fig.align='center'}
+include_graphics('/img/g.jpg',dpi = 60)
 
+```
+Image source: Süß, H. M., & Beauducel, A. (2015). Modeling the construct validity of the Berlin Intelligence Structure Model. Estudos de Psicologia (Campinas), 32(1), 13-25.
 
 
 ### Statistical modelling -- what are we doing?
