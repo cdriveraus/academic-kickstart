@@ -22,16 +22,17 @@ options(knitr.graphics.error=FALSE)
 savedir <- normalizePath(paste0(getwd(),'/',slug))
 ```
 
-What is a dynamic system? Why are they interesting? How do we take bits of the bumbling buzzing confusion around us and pack them into a statistical model of change to make nuanced predictions and test interesting hypotheses about 'stuff that happens' so we can better adjust the buzzing confusion to our tastes? For some of my opinion, *not* intended as rigorous philosophy of science / statistics but as an approachable start to thinking about systems modelling, read on...
+What is a dynamic system? Why are they interesting? How do we take bits of the bumbling buzzing confusion around us and pack them into a statistical model of change to make nuanced predictions and test interesting hypotheses about 'stuff that happens' so we can better adjust the buzzing confusion to our tastes? For some of my opinion, *not* intended as rigorous philosophy of science / statistics, but as a start to thinking about systems modelling, read on...
 
-Precise definitions can be troublesome, but in general most things psychologists are interested in can be thought of as dynamic systems, but often just a single instant in the time course of the system is focused on, using cross-sectional data.
+Precise definitions can be troublesome, but in general most things psychologists are interested in can be thought of as dynamic systems, but often just a single instant in the time course of the system is focused on, using cross-sectional data. A dynamic systems *model* can then be thought of as a representation of how a system changes depending on various inputs.
 
-### Simplest model of change / 'dynamics'? Probably a t-test!
+### Simplest model of change / 'dynamics'? 
+In a very loose sense, we can sometimes think of the humble t-test as a model of change -- for example:
 
 * Does ice cream make people happy?
-  + 2 groups, experimental and control.
-  + Give experimental group ice cream.
-  + Ask about happiness.
+  + Take 2 groups of subjects, experimental and control.
+  + Give experimental group ice cream, control group nothing.
+  + After some time, ask about happiness.
 
 ```{r, echo=F,out.width='60%', fig.align='center'}
 include_graphics('/img/icecream2.jpg')
@@ -60,20 +61,9 @@ include_graphics('/img/climatescienceplan.jpg')
 
 ---
 
-### Different levels of explanation.
-Fundamental to model building is to address concerns at an appropriate level. While it is not always straightforward to determine what this level should be, and this may change over time with changing knowledge, I'd suggest that scientific constructs do useful work when either: They represent (at least approximately) something we care about in and of itself, as for instance with things like satisfaction, hunger, pain; or they fit somewhere in our tangled web of knowledge, eventually connecting to things we care about. If we're interested in the feeling of wellbeing and comfort provided by physical contact with a loved one, we could conceivably model this (some time in the future!) based on an *extremely* large model involving fundamental particles, but including higher level constructs like 'people' will likely offer a much more tractable model, easier to understand and develop further. Perhaps at some level of model richness, brain structures become useful, as do perhaps social conditions. 
-
-Another aspect of the 'level' of a construct is that of the time scale -- quite some debate occurred as to whether short term transient states like a sunny day influenced measures of wellbeing. One way out of such worries is to acknowledge that yes, there are likely to be a range of short term influences on answers to wellbeing related questions, but most such things can probably also be treated as some form of measurement error / noise when the interest is on the year or decade time scale. If the interest was more on the hourly time scale, then fluctuations at one hour likely *are* informative for the next hour, so they shouldn't be treated as measurement error.
-
-This diagram from Lindenberger, Li, & Bäckman, (2006), neatly demonstrates both the short vs long timescale, and high vs low construct level, for typical cases in developmental psychology / neuroscience.
-
-```{r, echo=F,out.width='65%', fig.align='center'}
-include_graphics('/img/brainbehaviourenvironment.jpg')
-```
-
----
-
 ### Dynamic systems example uses - non psychology:
+
+In a very general sense, models of how things change are successful in many fields. A few examples:
 
 * Weather and climate
 
@@ -134,12 +124,26 @@ include_graphics('/img/corona5part.jpg')
 include_graphics('/img/corona5full.jpg')
 ```
 
+---
+
+### Different levels of explanation.
+
+In order to build useful models of how systems we are interested in change, the aspects of the system need to be modeled at an appropriate level. While it is not always straightforward to determine what this level should be, and this may change over time with changing knowledge, I'd suggest that scientific constructs do useful work when either: They represent (at least approximately) something we care about in and of itself, as for instance with things like satisfaction, hunger, pain; or they fit somewhere in our tangled web of knowledge, eventually connecting to things we care about. If we're interested in the feeling of wellbeing and comfort provided by physical contact with a loved one, we could conceivably model this (some time in the future!) based on an *extremely* large model involving fundamental particles, but including higher level constructs like 'people' will likely offer a much more tractable model, easier to understand and develop further. Perhaps at some level of model richness, brain structures become useful, as do perhaps social conditions. 
+
+Another aspect of the 'level' of a construct is that of the time scale -- quite some debate occurred as to whether short term transient states like a sunny day influenced measures of wellbeing. One way out of such worries is to acknowledge that yes, there are likely to be a range of short term influences on answers to wellbeing related questions, but most such things can probably also be treated as some form of measurement error / noise when the interest is on the year or decade time scale. If the interest was more on the hourly time scale, then fluctuations at one hour likely *are* informative for the next hour, so they shouldn't be treated as measurement error.
+
+This diagram from Lindenberger, Li, & Bäckman, (2006), neatly demonstrates both the short vs long timescale, and high vs low construct level, for typical cases in developmental psychology / neuroscience.
+
+```{r, echo=F,out.width='65%', fig.align='center'}
+include_graphics('/img/brainbehaviourenvironment.jpg')
+```
+
 
 ---
 
 ### Statistical modelling
 
-* Model is approx. a core theory / idea + some extra assumptions. 
+A statistical model usually involves aspects that constitute our actual knowledge and or theory, as well as some auxiliiary aspects that we are willing to assume in order that the model is generalisable and useful. Considering the G factor theory of intelligence, we often end up with something like the following. 
 
 * Core idea: Intelligence is composed of multiple facets that tend to take on similar values.
 
@@ -155,7 +159,7 @@ Image source: Süß, H. M., & Beauducel, A. (2015). Modeling the construct valid
 
 
 ### Statistical modelling -- what are we doing?
-* We want to see how a little piece of the world works -- composed of a range of related variables in some weirdly shaped multidimensional space. I labeled it 'theory space' at one point, but just a rough representation.
+* We want to see how a little piece of the world works -- we can think of this 'piece of the world' as composed of a range of related variables in some weirdly shaped multidimensional space. I labeled it 'theory space' at one point, to represent the idea that there is some reasonable set of elements in the universe that are relevant for the particular thing we are interested in. If we go back to the ice cream and happiness example, this space could obviously contain hunger, age, temperature, time since consumption, quantity / quality consumed, and many other aspects.
 * We often start with some very vague ideas about how the aspects in this space are related, goals of modelling can be to test specific ideas and or to improve and quantify our knowledge of the various relations between variables -- e.g. the size, time, context, of effects.
 * Requires some kind of overall plan -- what do we look at, how do we quantify this? 
 
@@ -166,8 +170,7 @@ include_graphics('/img/theoryspace2.png',dpi=150)
 
 * Model/s -- to create a model, we need to decide which aspects of the space we cover, how do we relate the information within?
 * A model invariabily distorts, and leaves out some aspects of, the 'true' system of interest. 
-* In exchange for this, we can replace mere infinitesimal points in the large space, with links between different regions. (i.e. different values of different variables, that we have not explicitly observed) 
-* These 'links' (the model!) allow for predictions about what new data would look like and how we might expect variables in a region to be related. As new data comes in, such links / predictions can be tested, and the model refined or rejected.
+* In exchange for this, we can replace mere infinitesimal points in the large space, with links between different regions. (i.e. different values of different variables, that we have not explicitly observed) For instance, in a simple model we might have a linear relationship between ambient temperature and the resulting pleasure from eating. * These 'links' (the model!) allow for predictions about what new data would look like and how we might expect variables in a region to be related. As new data comes in, such links / predictions can be tested, and the model refined or rejected. So, once we collect data from Antarctic scientists delivered a load of ice cream, we might improve on the linear model. 
 * How large / unified should our models be? Depends! More information helps to constrain the system and can provide better predictions and a more integrated pile of knowledge, but it can also make the modelling process, both for the computer and the human, less tractable.
 
 #### 'Modeled' space with some aspects dropped, but links between regions / variables in the space:
