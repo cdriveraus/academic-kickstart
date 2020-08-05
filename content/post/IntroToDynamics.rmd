@@ -1,5 +1,5 @@
 ---
-title: Dynamic Systems in Psychology
+title: Dynamic Systems Modeling in Psychology
 author: Charles Driver
 date: '2020-07-14'
 slug: DynSysIntro
@@ -71,9 +71,7 @@ include_graphics('/img/brainbehaviourenvironment.jpg')
 ```
 
 ---
-### Example uses?
-
-* Non psychology:
+### Dynamic systems example uses - non psychology:
 
  + Weather and climate
  
@@ -90,19 +88,19 @@ include_graphics('/img/filter.jpg')
 
 
 
-### Example uses - Psychology
+### Dynamic systems example uses - Psychology
 * Some models of decision making treat the decision process as a simple dynamic system
 ```{r, echo=F,out.width='105%', fig.align='center'}
 include_graphics('/img/ddm.jpg')
 ```
-
+Image source: Vinding, M., Lindeløv, J. K., Xiao, Y., Chan, R. C., & Sørensen, T. A. (2018). Volition in Prospective Memory: evidence against differences in recalling free and fixed delayed intentions.
 
 
 * Interest in psychopathology as networks of symptoms has grown a lot in recent years, people are starting to put the pieces together to consider them as symptom (and other feature) networks evolving in time.
 ```{r, echo=F,out.width='90%', fig.align='center'}
 include_graphics('/img/networks.png')
 ```
-
+Image source: Armour, C., Fried, E. I., Deserno, M. K., Tsai, J., & Pietrzak, R. H. (2017). A network analysis of DSM-5 posttraumatic stress disorder symptoms and correlates in US military veterans. Journal of anxiety disorders, 45, 49-59.
 
 * In general there is plenty of history of thinking in a dynamic systems framework.in psychology..
 
@@ -137,7 +135,7 @@ include_graphics('/img/corona5full.jpg')
 
 ---
 
-# Statistical modelling
+### Statistical modelling
 
 * Model is approx. a core theory / idea + some extra assumptions.
 
@@ -153,7 +151,7 @@ include_graphics('/img/g.jpg')
 
 
 
-# Statistical modelling -- what are we doing?
+### Statistical modelling -- what are we doing?
 * We want to see how a little piece of the world works -- composed of a range of related variables in some weirdly shaped multidimensional space. I labeled it 'theory space' at one point, but just a rough representation.
 * We often start with some very vague ideas about how the aspects in this space are related, goals of modelling can be to test specific ideas and or to improve and quantify our knowledge of the various relations between variables -- e.g. the size, time, context, of effects.
 * Requires some kind of overall plan -- what do we look at, how do we quantify this? 
