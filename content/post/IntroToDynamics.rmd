@@ -22,7 +22,7 @@ options(knitr.graphics.error=FALSE)
 savedir <- normalizePath(paste0(getwd(),'/',slug))
 ```
 
-What is a dynamic system? Why are they interesting? How do we take bits of the bumbling buzzing confusion around us and pack them into a statistical model of change to make nuanced predictions and test interesting hypotheses about 'stuff that happens' so we can better adjust the buzzing confusion to our tastes? For some of my opinion, *not* intended as rigorous philosophy of science / statistics, but as a start to thinking about systems modelling, read on...
+What is a dynamic system? Why are they interesting? How do we take bits of the bumbling buzzing confusion around us and pack them into a statistical model of change to make nuanced predictions and test interesting hypotheses about 'stuff that happens' so we can better adjust the buzzing confusion to our tastes? I'm turning the class I recently taught into some blog posts, so for some of my opinion, *not* intended as rigorous philosophy of science / statistics, but as a start to thinking about systems modelling, read on...
 
 Precise definitions can be troublesome, but in general most things psychologists are interested in can be thought of as dynamic systems, but often just a single instant in the time course of the system is focused on, using cross-sectional data. A dynamic systems *model* can then be thought of as a representation of how a system changes depending on the various parts of the system and various inputs.
 
