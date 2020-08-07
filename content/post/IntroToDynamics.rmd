@@ -60,6 +60,7 @@ include_graphics('/img/climatescienceplan.jpg')
 * Ok, in most cases psychology is still a long from such models. But it's a nice visual representation of a serious dynamic system model - multiple interacting factors that each play a role in how all the other bits change. Moving slowly in such a direction would represent useful progress, I think. 
 
 ---
+
 ### Why 'time' and 'dynamics' ?
 
 * Why should we care about how a system develops over time, specifically, isn't time just like any other variable we could decide to be interested in? We could also develop elaborate models for how a system changes in response to loud noise, or being poked with different size sticks. 
