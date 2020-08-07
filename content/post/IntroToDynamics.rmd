@@ -38,7 +38,7 @@ In a very loose sense, we can sometimes think of the humble t-test as a model of
 include_graphics('/img/icecream2.jpg')
 ```
 
-Such an experiment can give us a precise estimate of the average effect on measured happiness (i.e. some kind of affect / satisfaction / wellbeing variable) for the sample, in a specific context, a specific length of time after the 'treatment'. On it's own, this piece of knowledge is useless, as the context is unlikely to be exactly repeated, and anyway being happier at one brief moment when answering a survey question is not very useful. Only under assumptions of some kind of smoothness and regularity in the universe does such knowledge become useful -- we can start to think that *similar* people, in *similar* circumstances, may exhibit *similar* effects. Such assumptions of regularity are necessary for any form of knowledge and we are so familiar with such generalisation processes that we often don't notice -- but a critical part of this process is at least having a rough estimate of how far we can generalise. Psychology has a colourful history of cute studies, neat p values and vague / implicit assumptions leading to apparently profound effects that are not so profound in reality. To properly consider the usefulness of ice cream as a happiness treatment, or to leverage the ice cream treatment to better understand wellbeing constructs, we need to embed this new knowledge in the broader system we're interested in.
+Such an experiment can give us a precise estimate of the average effect on measured happiness (i.e. some kind of affect / satisfaction / wellbeing variable) for the sample, in a specific context, a specific length of time after the 'treatment'. On it's own, this piece of knowledge is useless, as the context is unlikely to be exactly repeated, and anyway being happier at one brief moment when answering a survey question is not very useful. Only under assumptions of some kind of smoothness and regularity in the universe does such knowledge become useful -- we can start to think that *similar* people, in *similar* circumstances, may exhibit *similar* effects. Such assumptions of regularity are necessary for any form of knowledge and we are so familiar with such generalisation processes that we often don't notice -- but a critical part of this process is at least having a rough estimate of how far we can generalise. Psychology has a colourful history of cute studies, neat p values and vague / implicit assumptions leading to apparently profound effects that are not so profound in reality. To properly consider the usefulness of ice cream as a happiness treatment, or to leverage the ice cream treatment to better understand wellbeing constructs, we need to embed this new knowledge in the broader system we're interested in. 
 
 
 ##### Perhaps a little more nuance is needed? 
@@ -60,6 +60,20 @@ include_graphics('/img/climatescienceplan.jpg')
 * Ok, in most cases psychology is still a long from such models. But it's a nice visual representation of a serious dynamic system model - multiple interacting factors that each play a role in how all the other bits change. Moving slowly in such a direction would represent useful progress, I think. 
 
 ---
+### Why 'time' and 'dynamics' ?
+
+* Why should we care about how a system develops over time, specifically, isn't time just like any other variable we could decide to be interested in? We could also develop elaborate models for how a system changes in response to loud noise, or being poked with different size sticks. 
+
+* The interesting thing about 'time' is not that we're specifically interested in the passing of time itself, but that it basically serves as a proxy for 'all the stuff in the universe that tends to happen'. So you eat the ice cream, start digesting, chemicals start bouncing around a little differently inside you, behaviour changes slightly, other people respond a little differently, and you continue experiencing more of the 'stuff of the universe happening near you'. So when we create a model for how something changes over time, this is then some sort of general model for how this thing tends to change when we don't do anything specific, except the initial input. 
+
+* Time is also a critical element with respect to causal chains -- a change in one thing leads to a different thing changing, which in turn leads to yet another thing changing. Mediation is a popular concept in psychology, but in many cases somewhat incoherent without a notion of time passing, and a question that should then arise is how the different processes look at different times after an initial change. For example, we could be interested in the mediating role of exercise habits on peoples fitness. Intervening on peoples habits and checking fitness a day later is likely quite ineffective, but we can measure the change in habits and build / estimate a model for how this change in habits translates into change in fitness, conditional on the passing of time and any other variables we are interested in (e.g. baseline fitness, motivation to change habits, etc). 
+
+* We could of course ignore time in the model, test at a specific time point, hope that neither too much nor too little time had passed, and claim an effect -- but models that consider the temporal development are far more useful for both predictions in applied contexts, and for incorporating new knowledge. In both cases this is because the temporal model applies to a time span, rather than a specific instant. Prediction or incorporating new knowledge based on a model for a single point in time (i.e. not dynamic) to a different point in time requires entirely untested assumptions about the time course -- if the dynamic model is developed and tested at all sensibly, it should outperform such assumptions!
+
+
+---
+
+
 
 ### Dynamic systems example uses - non psychology:
 
@@ -120,7 +134,7 @@ include_graphics('/img/corona5part.jpg')
 
 
 * Such knowledge of other subjects behaviour, and a specific subjects past, can lead to improved predictions of the future.
-```{r, echo=F,out.width='30%', fig.align='center'}
+```{r, echo=F,out.width='80%', fig.align='center'}
 include_graphics('/img/corona5full.jpg')
 ```
 
