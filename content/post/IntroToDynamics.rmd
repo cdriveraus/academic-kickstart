@@ -194,5 +194,5 @@ include_graphics('/img/theoryspace3.png',dpi=150)
 
 ```
 
-Next post I will take a look at ways of representing dynamic systems a little more concretely. 
+[Next post](/post/DiscreteTime/), I will take a look at ways of representing dynamic systems a little more concretely. 
 
