@@ -1,0 +1,75 @@
+---
+title: Binary data in state space models
+author: Charles Driver
+date: '2021-5-28'
+lastmod: 2020-8-14T18:33:24+01:00
+slug: BinaryData
+output: html_document
+featured: no
+image:
+  caption: ''
+preview_only: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE)
+slug <- 'BinaryData'
+library(knitr)
+dir.create(slug)
+options(knitr.graphics.error=FALSE)
+
+savedir <- paste0(getwd(),'/',slug)
+```
+
+## Generate some data
+Here we specify a bivariate latent process where the 1st process affects the 2nd, and there are stable individual differences in the processes.
+
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
+library(ctsem)
+gm <- ctModel(LAMBDA=diag(2), #diagonal factor loading, 2 latents 2 observables
+  Tpoints = 50,
+  DRIFT=matrix(c(-1,.5,0,-1),2,2), #temporal dynamics
+  TRAITVAR = diag(.5,2), #stable latent intercept variance (cholesky factor)
+  DIFFUSION=diag(2)) #within person covariance 
+
+d <- data.frame(ctGenerate(ctmodelobj = gm,n.subjects = 100,burnin = 20,dtmean = .1))
+```
+
+
+We didn't specify any measurement error in the above code, because we're going to mix the regular Gaussian approach with binary data measurements:
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
+d$Y2binary <-rbinom(n = nrow(d),size = 1, #create binary data based on the latent
+  prob = ctsem::inv_logit(d$Y2))
+d$Y1 <- d$Y1 + rnorm(nrow(d),0,.2) #gaussian measurement error
+```
+
+
+Now we setup our model for estimation -- we no longer hard code the values of the simulation! We also fix the MANIFESTMEANS (measurement intercept) and free the CINT (continuous / latent process intercept) because that will be more appropriate if there are stable differences in the latent process. In Gaussian cases this choice of how to identify the model very often makes no difference, but it is more crucial with non-linearity. Note that there are many system matrices left unspecified, which will be freely estimated by default. The final step is to specify the measurement model by altering the model object directly -- once the binary feature gets more development time I will probably create a nicer approach for this. 0 for the first manifest specifies that it is Gaussian, while the 1 specifies that our second variable (listed in manifestNames) is binary.
+
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
+m <- ctModel(LAMBDA=diag(2),type='stanct',
+  manifestNames = c('Y1','Y2binary'),
+  MANIFESTMEANS = 0,
+  CINT=c('cint1','cint2'))
+
+m$manifesttype=c(0,1)
+```
+
+Then we fit and summarise the model:
+
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
+f <- ctStanFit(datalong = d,ctstanmodel = m,cores=6)
+s=summary(f)
+print(s$popmeans)
+```
+
+Then add a few plots showing temporal regression coefficients conditional on time interval, measurement expectations conditional on estimated parameters and past data, and finally latent states conditional on estimated parameters and both past and future data.
+
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
+ctStanDiscretePars(f,plot=T)
+
+ctKalman(f,subjects = c(2,5),plot=T)
+ctKalman(f,subjects = c(2,5),plot=T,kalmanvec=c('etasmooth'))
+
+
+```
