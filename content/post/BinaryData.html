@@ -23,7 +23,12 @@ gm &lt;- ctModel(LAMBDA=diag(2), #diagonal factor loading, 2 latents 2 observabl
   TRAITVAR = diag(.5,2), #stable latent intercept variance (cholesky factor)
   DIFFUSION=diag(2)) #within person covariance 
 
-d &lt;- data.frame(ctGenerate(ctmodelobj = gm,n.subjects = 100,burnin = 20,dtmean = .1))</code></pre>
+ctModelLatex(gm) #to view latex system equations
+
+#when generating data, free pars are set to 0
+d &lt;- data.frame(ctGenerate(ctmodelobj = gm,n.subjects = 100,
+  burnin = 20,dtmean = .1))</code></pre>
+<p><img src="/post/BinaryData_files/figure-html/TEX-1.png" width="672" /></p>
 <p>We didn’t specify any measurement error in the above code, because we’re going to mix the regular Gaussian approach with binary data measurements:</p>
 <pre class="r"><code>d$Y2binary &lt;-rbinom(n = nrow(d),size = 1, #create binary data based on the latent
   prob = ctsem::inv_logit(d$Y2))
@@ -57,7 +62,9 @@ print(s$popmeans)
 ## diff_eta2        1.1231 0.2898  0.8680  1.0219  1.5403
 ## mvarY1           0.1919 0.0054  0.1826  0.1938  0.1953
 ## cint1            0.0257 0.1049 -0.1149  0.0126  0.1470
-## cint2            0.2688 0.1645  0.0552  0.2704  0.4969</code></pre>
+## cint2            0.2688 0.1645  0.0552  0.2704  0.4969
+ctModelLatex(f)</code></pre>
+<p><img src="/post/BinaryData_files/figure-html/texfit-1.png" width="672" /></p>
 <p>Then add a few plots showing temporal regression coefficients conditional on time interval, measurement expectations conditional on estimated parameters and past data, and finally latent states conditional on estimated parameters and both past and future data.</p>
 <pre class="r"><code>ctStanDiscretePars(f,plot=T)</code></pre>
 <p><img src="/post/BinaryData_files/figure-html/unnamed-chunk-5-1.png" width="100%" height="100%" style="display: block; margin: auto;" /></p>
