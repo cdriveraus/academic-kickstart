@@ -68,7 +68,7 @@ m <- ctModel(LAMBDA=diag(2),type='stanct',
 m$manifesttype=c(0,1)
 ```
 
-Then we fit and summarise the model:
+Then we fit and summarise the model -- note that at time of writing the latex output doesn't know about the binary measurement model for the 2nd observable, and incorrectly shows the errors as Gaussian.
 
 ```{r, echo=T,out.width='100%',out.height='100%', fig.align='center'}
 f <- ctStanFit(datalong = d,ctstanmodel = m,cores=6)

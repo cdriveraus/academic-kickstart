@@ -46,7 +46,7 @@ d$Y1 &lt;- d$Y1 + rnorm(nrow(d),0,.2) #gaussian measurement error</code></pre>
 ## [2,] &quot;cint2&quot;
 
 m$manifesttype=c(0,1)</code></pre>
-<p>Then we fit and summarise the model:</p>
+<p>Then we fit and summarise the model – note that at time of writing the latex output doesn’t know about the binary measurement model for the 2nd observable, and incorrectly shows the errors as Gaussian.</p>
 <pre class="r"><code>f &lt;- ctStanFit(datalong = d,ctstanmodel = m,cores=6)
 s=summary(f)
 print(s$popmeans)
