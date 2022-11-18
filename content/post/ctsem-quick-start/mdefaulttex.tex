@@ -10,9 +10,11 @@
 
 \begin{document}
 \pagenumbering{gobble}
- \begin{footnotesize}
+\begin{footnotesize}
+
  \setcounter{MaxMatrixCols}{200}
-  \begin{align*}
+ \begin{flalign*}
+  &\begin{aligned}
   \parbox{10em}{\centering{Initial\linebreak latent\linebreak state:}}
   &\underbrace{\begin{bmatrix}
 \text{ss\_level}\\ 
@@ -21,15 +23,15 @@
     \big{(}t_0\big{)}}_{\vect{\eta} (t_0)}	\sim \mathrm{N} \left(
               \underbrace{
         \begin{bmatrix}
--44.799\\ 
-1.034
+-44.507\\ 
+0.383
 \end{bmatrix}
       }_{\underbrace{\vect{}}_\textrm{T0MEANS}},
-      \underbrace{
+      \underbrace{UcorSDtoCov \left\{
         \begin{bmatrix}
 1 & 0\\ 
 0 & 1
-\end{bmatrix}
+\end{bmatrix}\right\}
       }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
       \right) \\
       \parbox{10em}{\centering{Deterministic\linebreak change:}}
@@ -42,7 +44,7 @@
       \underbrace{
         \begin{bmatrix}
 0 & 1\\ 
--0.456 & -0.68
+-0.456 & -0.676
 \end{bmatrix}
       }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
         \begin{bmatrix}
@@ -57,10 +59,10 @@
 \end{bmatrix}
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
     \parbox{10em}{\centering{Random\linebreak change:}}
-    & \qquad \qquad \quad \underbrace{cholsdcor\left\{
+    & \qquad \qquad \quad \underbrace{UcorSDtoChol\left\{
       \begin{bmatrix}
 0 & 0\\ 
-0 & 31.349
+0 & 31.233
 \end{bmatrix}\right\}
     }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}
     \underbrace{\mathrm{d}
@@ -69,7 +71,7 @@ W_{1}\\
 W_{2}
 \end{bmatrix} 
       (t)}_{\mathrm{d} \vect{W}(t)} \\ \\
-              \textrm{Observations: }
+              \parbox{10em}{\centering{Observations:}}
 &\underbrace{
       \begin{bmatrix}
 \text{sunspots}
@@ -87,10 +89,11 @@ W_{2}
           (t)}_{\vect{\eta}(t)} +
         \underbrace{
           \begin{bmatrix}
-49.759
+49.55
 \end{bmatrix} 
-        }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + 
-              \underbrace{
+        }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + \nonumber \\ \\
+    \parbox{10em}{\centering{Observation\linebreak noise:}}
+    & \qquad \qquad \quad  \underbrace{
                 \begin{bmatrix}
 0
 \end{bmatrix}  
@@ -100,16 +103,14 @@ W_{2}
 \epsilon_{1}
 \end{bmatrix} 
           (t)}_{\vect{\epsilon}(t)} \\ \\
-                \parbox{10em}{\centering{Latent noise\linebreak per time step:}}
+                \parbox{10em}{\centering{System noise\linebreak distribution per time step:}}
           &\Delta \big[W_{j \in [1,2]}\big](t-u)   \sim  \mathrm{N}(0,t-u) \quad
-              \parbox{10em}{\centering{Observation\linebreak noise:}}
+              \parbox{10em}{\centering{Observation noise\linebreak distribution:}}
             \begin{bmatrix}
 \epsilon_{j \in [1,2]}
 \end{bmatrix} 
             (t) \sim  \mathrm{N}(0,1) \\ \\
-&cholsdcor\textrm{ converts lower tri matrix of std dev and unconstrained correlation to Cholesky factor covariance.} \\
-&covsdcor =\textrm{ transposed cross product of cholsdcor, to give covariance.} \\
-&\textrm{See Driver \& Voelkle (2018) p11.}
-      \end{align*}
-      \end{footnotesize}
-      \end{document}
+      \end{aligned} \\&\textrm{Note: } UcorSDtoChol\textrm{ converts lower tri matrix of standard deviations and unconstrained correlations to Cholesky factor,} \\
+&UcorSDtoCov =\textrm{ transposed cross product of UcorSDtoChol, to give covariance, See Driver \& Voelkle (2018) p11.} \\\end{flalign*}
+        \end{footnotesize}
+\end{document}

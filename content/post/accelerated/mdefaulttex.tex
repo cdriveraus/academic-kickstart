@@ -17,56 +17,81 @@
   &\begin{aligned}
   \parbox{10em}{\centering{Subject\linebreak parameter\linebreak distribution:}}
              &\underbrace{\begin{bmatrix}
-\text{T0m\_ly}_i\\ 
-\text{mm\_y}_i
+\text{T0m\_eta1}_i\\ 
+\text{cint}_i\\ 
+\text{drift\_eta1}_i\\ 
+\text{diff\_eta1}_i\\ 
+\text{mvarYobs}_i\\ 
+\text{T0var\_eta1}_i
 \end{bmatrix} 
             }_{\vect{\phi}(i)} \sim\textrm{tform}\left\{ \mathrm{N} \left(
               \begin{bmatrix}
-\text{raw\_T0m\_ly}\\ 
-\text{raw\_mm\_y}
+\text{raw\_T0m\_eta1}\\ 
+\text{raw\_cint}\\ 
+\text{raw\_drift\_eta1}\\ 
+\text{raw\_diff\_eta1}\\ 
+\text{raw\_mvarYobs}\\ 
+\text{raw\_T0var\_eta1}
 \end{bmatrix}, \begin{bmatrix}
-\text{rawPCov\_1\_1} & \text{rawPCov\_2\_1}\\ 
-\text{rawPCov\_2\_1} & \text{rawPCov\_2\_2}
-\end{bmatrix} \right) \right\} \\\parbox{10em}{\centering{Initial\linebreak latent\linebreak state:}}
+\text{rawPCov\_1\_1} & \text{rawPCov\_2\_1} & 0 & 0 & 0 & 0\\ 
+\text{rawPCov\_2\_1} & \text{rawPCov\_2\_2} & 0 & 0 & 0 & 0\\ 
+0 & 0 & 0 & 0 & 0 & 0\\ 
+0 & 0 & 0 & 0 & 0 & 0\\ 
+0 & 0 & 0 & 0 & 0 & 0\\ 
+0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix} \right)  + \underbrace{\begin{bmatrix}
+\text{raw\_T0m\_eta1\_Cohort2} & \text{raw\_T0m\_eta1\_Cohort3} & \text{raw\_T0m\_eta1\_Cohort4}\\ 
+\text{raw\_cint\_Cohort2} & \text{raw\_cint\_Cohort3} & \text{raw\_cint\_Cohort4}\\ 
+\text{raw\_drift\_eta1\_Cohort2} & \text{raw\_drift\_eta1\_Cohort3} & \text{raw\_drift\_eta1\_Cohort4}\\ 
+\text{raw\_diff\_eta1\_Cohort2} & \text{raw\_diff\_eta1\_Cohort3} & \text{raw\_diff\_eta1\_Cohort4}\\ 
+\text{raw\_mvarYobs\_Cohort2} & \text{raw\_mvarYobs\_Cohort3} & \text{raw\_mvarYobs\_Cohort4}\\ 
+\text{raw\_T0var\_eta1\_Cohort2} & \text{raw\_T0var\_eta1\_Cohort3} & \text{raw\_T0var\_eta1\_Cohort4}
+\end{bmatrix}}_{\vect{\beta}}
+  \underbrace{
+    \begin{bmatrix}
+\text{Cohort2}\\ 
+\text{Cohort3}\\ 
+\text{Cohort4}
+\end{bmatrix}}_{\vect{z}}\right\} \\\parbox{10em}{\centering{Initial\linebreak latent\linebreak state:}}
   &\underbrace{\begin{bmatrix}
-\text{ly}
+\text{eta1}
 \end{bmatrix} 
     \big{(}t_0\big{)}}_{\vect{\eta} (t_0)}	\sim \mathrm{N} \left(
               \underbrace{
         \begin{bmatrix}
-\text{T0m\_ly}
+\text{T0m\_eta1}
 \end{bmatrix}
       }_{\underbrace{\vect{}}_\textrm{T0MEANS}},
       \underbrace{UcorSDtoCov \left\{
         \begin{bmatrix}
-0.01
+0.001
 \end{bmatrix}\right\}
       }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
       \right) \\
       \parbox{10em}{\centering{Deterministic\linebreak change:}}
   &\underbrace{\mathrm{d}
     \begin{bmatrix}
-\text{ly}
+\text{eta1}
 \end{bmatrix} 
     \big{(}t\big{)}}_{\mathrm{d} \vect{\eta} (t)}	=  \left(
       \underbrace{
         \begin{bmatrix}
-\text{drift\_ly}
+\text{drift\_eta1}
 \end{bmatrix}
       }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
         \begin{bmatrix}
-\text{ly}
+\text{eta1}
 \end{bmatrix} 
         \big{(}t\big{)}
       }_{\vect{\eta} (t)}	+ \underbrace{
         \begin{bmatrix}
-0
+\text{cint}
 \end{bmatrix}
       }_{\underbrace{\vect{b}}_\textrm{CINT}}\right) \mathrm{d}t \quad + \nonumber \\ \\
     \parbox{10em}{\centering{Random\linebreak change:}}
     & \qquad \qquad \quad \underbrace{UcorSDtoChol\left\{
       \begin{bmatrix}
-\text{diff\_ly}
+\text{diff\_eta1}
 \end{bmatrix}\right\}
     }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}
     \underbrace{\mathrm{d}
@@ -77,7 +102,7 @@ W_{1}
               \parbox{10em}{\centering{Observations:}}
 &\underbrace{
       \begin{bmatrix}
-\text{y}
+\text{Yobs}
 \end{bmatrix}  
       (t)}_{\vect{Y}(t)} = 
         \underbrace{
@@ -86,18 +111,18 @@ W_{1}
 \end{bmatrix} 
         }_{\underbrace{\vect{\Lambda}}_\textrm{LAMBDA}} \underbrace{
           \begin{bmatrix}
-\text{ly}
+\text{eta1}
 \end{bmatrix} 
           (t)}_{\vect{\eta}(t)} +
         \underbrace{
           \begin{bmatrix}
-\text{mm\_y}
+0
 \end{bmatrix} 
         }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + \nonumber \\ \\
     \parbox{10em}{\centering{Observation\linebreak noise:}}
     & \qquad \qquad \quad  \underbrace{
                 \begin{bmatrix}
-0.2
+\text{mvarYobs}
 \end{bmatrix}  
               }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
               \underbrace{
