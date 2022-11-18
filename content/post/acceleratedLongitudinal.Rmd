@@ -123,14 +123,16 @@ f2 <- ctStanFit(datalong = dat, ctstanmodel = m2, cores=2)
 
 With cohort influences on the system parameters, the model looks like:
 
-```{r TEX,echo=FALSE,fig.height=8}
-ctModelLatex(m2,textsize = 'footnotesize', folder=savedir,
+```{r TEX,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(m2,textsize = 'small', folder=savedir,
   filename = 'mdefaulttex',open=FALSE)
 
-library(magick)
-tiger <- image_trim(image_read_pdf(paste0(savedir,'/mdefaulttex.pdf'),density = 300))
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/mdefaulttex.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/mdefaulttex.png'))
+```
 
-plot(tiger)
+```{r,echo=T,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics('mdefaulttex.png')
 ```
 
 We can plot expectations for a subject from each group based only on covariates (i.e. group membership) as follows.

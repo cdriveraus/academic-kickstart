@@ -157,14 +157,14 @@ We can use the functions of ctsem to generate data from our prior distribution, 
 
 ```{r}
 library(ggplot2)
-priorpred <- ctStanGenerate(ctm = ssmodel, 
+priorpred <- ctStanGenerate(cts = ssmodel, 
   datastruct = ssdat, cores=2, nsamples = 200)
 
 ggplot(data=ssdat,mapping = aes(y=sunspots,x=time)) + 
   theme_minimal()+
-  geom_line(data=data.frame(sunspots=c(priorpred),
-    time=rep(ssdat$time,dim(priorpred)[2]),
-    sample=factor(rep(1:dim(priorpred)[2],each=dim(priorpred)[1]))), 
+  geom_line(data=data.frame(sunspots=c(priorpred$Y),
+    time=rep(ssdat$time,dim(priorpred$Y)[1]),
+    sample=factor(rep(1:dim(priorpred$Y)[1],each=dim(priorpred$Y)[2]))), 
     alpha=.3,colour='red',aes(group=sample))+
   geom_line(colour='black',size=1)+
   coord_cartesian(ylim = c(-100,200))
@@ -188,9 +188,9 @@ postpred <- ctStanGenerateFromFit(ssfit, fullposterior = TRUE, nsamples = 3)
 ggplot(data=ssdat,mapping = aes(y=sunspots,x=time)) + 
   theme_minimal()+
   geom_line(data=data.frame(sunspots=c(postpred$generated$Y),
-    sample = factor(rep(1:dim(postpred$generated$Y)[2],
-      each=dim(postpred$generated$Y)[1])),
-    time=rep(postpred$standata$time,dim(postpred$generated$Y)[2])), 
+    sample = factor(rep(1:dim(postpred$generated$Y)[1],
+      each=dim(postpred$generated$Y)[2])),
+    time=rep(postpred$standata$time,dim(postpred$generated$Y)[1])), 
     alpha=.7,aes(colour=sample),size=.5)+
   geom_line(colour='black',size=1)
 ```

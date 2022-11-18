@@ -1,0 +1,67 @@
+---
+title: What is Heterogeneity, Really?
+author: Charles Driver
+date: 'November 2022'
+lastmod: 2022-11-03T18:33:24+01:00
+slug: Heterogeneity
+output: html_document
+featured: no
+image:
+  caption: ''
+preview_only: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(results=F,collapse = TRUE,cache=TRUE,warning=FALSE,message=FALSE)
+slug <- 'Heterogeneity'
+library(knitr)
+dir.create(slug)
+options(knitr.graphics.error=FALSE)
+
+savedir <- paste0(getwd(),'/',slug)
+```
+
+It seems a quite common understanding that unit level 'heterogeneity' (i.e. individual differences) when using statistical models reflects some innate characteristic of the individuals. Based on a tiny twitter discussion I thought it might be helpful to demonstrate that such apparent 'heterogeneity' can arise very easily as a result of model limitations or choices in how data is structured. 
+
+Let's observe a group of individuals at two occasions, with a space of 1 year between occasions.
+
+```{r, echo=F, fig.align='center'}
+library(ctsem)
+gm <- ctModel(LAMBDA=diag(1), #diagonal factor loading, 2 latents 2 observables
+  Tpoints = 50,
+  CINT=5,
+  DRIFT=-1, #temporal dynamics
+  DIFFUSION=.001,
+  MANIFESTVAR=.01) #measurement error sd
+
+#when generating data, free pars are set to 0
+d <- data.frame(ctGenerate(ctmodelobj = gm,n.subjects = 10,
+  burnin = 0,dtmean = .1))
+
+
+samplerows <- sort(unlist(lapply(unique(d$id),function(idi) {
+  x=sample((1:nrow(d))[d$id %in% idi & d$time < median(d$time)],size = 1)
+  return(c(x,x+10)) })))
+
+d2 <- d[samplerows,]
+d2$Observation <- as.integer(1:2)
+d2$id <- factor(d2$id)
+
+
+library(ggplot2)
+ggplot(d2,aes(x=Observation,y=Y1,colour=id))+geom_point()+geom_line()+theme_bw()+guides(colour='none')
+
+```
+
+Ok, interesting, we have some heterogeneity in the slope as a function of the individuals' baseline -- those who started lower increased more quickly.
+
+Now let's plot the same data as a function of the individuals' age. 
+
+```{r,echo=F, fig.align='center'}
+ggplot(d2,aes(x=time,y=Y1,colour=id))+geom_point()+geom_line()+theme_bw()+guides(colour='none')+xlab('Age')
+
+
+```
+
+Ahah. Our individuals are not really 'different' in some interesting way, they all experience the same pattern of growth, it's just that growth is nonlinear with respect to age. So, our initial 'model' (just a plot in this case) was simply limited in that it didn't account for this feature of the system we're interested in -- there's no inherent differences in the system across individuals though!
+

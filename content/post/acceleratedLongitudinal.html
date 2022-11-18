@@ -89,7 +89,8 @@ m2 &lt;- ctModel(
 
 f2 &lt;- ctStanFit(datalong = dat, ctstanmodel = m2, cores=2)</code></pre>
 <p>With cohort influences on the system parameters, the model looks like:</p>
-<p><img src="/post/acceleratedLongitudinal_files/figure-html/TEX-1.png" width="672" /></p>
+<pre class="r"><code>knitr::include_graphics(&#39;mdefaulttex.png&#39;)</code></pre>
+<p><img src="mdefaulttex.png" width="100%" height="100%" style="display: block; margin: auto auto auto 0;" /></p>
 <p>We can plot expectations for a subject from each group based only on covariates (i.e. group membership) as follows.</p>
 <pre class="r"><code>plot&lt;-ctKalman(f2, subjects = dat$id[!duplicated(dat$Cohort)], plot=T, 
   kalmanvec=c(&#39;yprior&#39;),removeObs = T, polygonsteps=1)
@@ -98,7 +99,7 @@ print(plot+facet_wrap(vars(Subject)))</code></pre>
 <p>Or if we want to display the best estimate for each individuals trajectory, conditioning on all available information (so no these are <em>not</em> forward predictions), we use the Kalman ‘smoothed’ estimates, like so:</p>
 <pre class="r"><code>ctKalman(f2, subjects = dat$id[!duplicated(dat$Cohort)], plot=T, 
   kalmanvec=c(&#39;y&#39;,&#39;etasmooth&#39;),facets=NA)</code></pre>
-<p><img src="/post/acceleratedLongitudinal_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/acceleratedLongitudinal_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>If cohort effects on the parameter means is deemed insufficient, and group differences on the random effects structure of parameters is also desirable, then for the time being at least you can’t rely on ctsem’s automatic random effects structuring, but have to build your own by extending the number of system states, and disabling ctsem’s random effects. System states for stable individual differences are essentially an unchanging process with a freely estimated starting point (T0MEANS), and freely estimated covariance with other processes at the start point (T0VAR).</p>
 <pre class="r"><code>
 m3 &lt;- ctModel(
@@ -125,7 +126,7 @@ m3 &lt;- ctModel(
 f3 &lt;- ctStanFit(datalong = dat, ctstanmodel = m3, cores=2)</code></pre>
 <p>In this case, we can also use the plot functions to observe how the estimates of the random effects individual differences get updated with each point of new data – before any of an individuals observations are known, the estimate is simply the mean for the cohort, but once observations start coming in, the prediction for individuals continuous intercept gets updated, just like the forward predictions for the main latent process of interest, eta. These plots are from the kalman predictions, which are requested by specifying either ‘etaprior’ (for latent process) or ‘yprior’ (for observation level) predictions.</p>
 <pre class="r"><code>ctKalman(f3, subjects = dat$id[!duplicated(dat$Cohort)],plot=T,kalmanvec=&#39;etaprior&#39;)</code></pre>
-<p><img src="/post/acceleratedLongitudinal_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/acceleratedLongitudinal_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>We can compare the different models for cohort differences using a few different approaches.</p>
 <p>Either AIC, with lower being better:</p>
 <pre class="r"><code>print(data.frame(

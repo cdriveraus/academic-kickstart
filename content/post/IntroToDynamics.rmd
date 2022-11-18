@@ -184,7 +184,7 @@ include_graphics('/img/theoryspace2.png',dpi=150)
 ```
 
 * Model/s -- to create a model, we need to decide which aspects of the space we cover, how do we relate the information within?
-* A model invariabily distorts, and leaves out some aspects of, the 'true' system of interest. 
+* A model invariably distorts, and leaves out some aspects of, the 'true' system of interest. 
 * In exchange for this, we can replace mere infinitesimal points in the large space, with links between different regions. (i.e. different values of different variables, that we have not explicitly observed) For instance, in a simple model we might have a linear relationship between ambient temperature and the resulting pleasure from eating. * These 'links' (the model!) allow for predictions about what new data would look like and how we might expect variables in a region to be related. As new data comes in, such links / predictions can be tested, and the model refined or rejected. So, once we collect data from Antarctic scientists who've been given a load of ice cream, we might improve on the linear model. 
 * How large / unified should our models be? Depends! More information helps to constrain the system and can provide better predictions and a more integrated pile of knowledge, but it can also make the modelling process, both for the computer and the human, less tractable.
 
