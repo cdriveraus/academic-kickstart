@@ -1,0 +1,145 @@
+
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\geometry{paperwidth=\maxdimen,paperheight=\maxdimen,margin=1cm}
+
+\usepackage[fleqn]{amsmath} %for multiple line equations
+\usepackage[active,tightpage,displaymath]{preview}
+\usepackage{bm}
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}}
+
+\begin{document}
+\pagenumbering{gobble}
+\begin{small}
+
+ \setcounter{MaxMatrixCols}{200}
+ \begin{flalign*}
+  &\begin{aligned}
+  \parbox{10em}{\centering{Subject\linebreak parameter\linebreak distribution:}}
+             &\underbrace{\begin{bmatrix}
+\text{T0m\_eta1}_i\\ 
+\text{T0m\_eta2}_i\\ 
+\text{cintStress}_i\\ 
+\text{cintQuality}_i
+\end{bmatrix} 
+            }_{\vect{\phi}(i)} \sim\textrm{tform}\left\{ \mathrm{N} \left(
+              \begin{bmatrix}
+\text{raw\_T0m\_eta1}\\ 
+\text{raw\_T0m\_eta2}\\ 
+\text{raw\_cintStress}\\ 
+\text{raw\_cintQuality}
+\end{bmatrix}, \begin{bmatrix}
+\text{rawPCov\_1\_1} & \text{rawPCov\_2\_1} & \text{rawPCov\_3\_1} & \text{rawPCov\_4\_1}\\ 
+\text{rawPCov\_2\_1} & \text{rawPCov\_2\_2} & \text{rawPCov\_3\_2} & \text{rawPCov\_4\_2}\\ 
+\text{rawPCov\_3\_1} & \text{rawPCov\_3\_2} & \text{rawPCov\_3\_3} & \text{rawPCov\_4\_3}\\ 
+\text{rawPCov\_4\_1} & \text{rawPCov\_4\_2} & \text{rawPCov\_4\_3} & \text{rawPCov\_4\_4}
+\end{bmatrix} \right) \right\} \\\parbox{10em}{\centering{Initial\linebreak latent\linebreak state:}}
+  &\underbrace{\begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+    \big{(}t_0\big{)}}_{\vect{\eta} (t_0)}	\sim \mathrm{N} \left(
+              \underbrace{
+        \begin{bmatrix}
+\text{T0m\_eta1}\\ 
+\text{T0m\_eta2}
+\end{bmatrix}
+      }_{\underbrace{\vect{}}_\textrm{T0MEANS}},
+      \underbrace{UcorSDtoCov \left\{
+        \begin{bmatrix}
+0.001 & 0\\ 
+0 & 0.001
+\end{bmatrix}\right\}
+      }_{\underbrace{\vect{Q^{*}}_{t0}}_\textrm{T0VAR}}
+      \right) \\
+      \parbox{10em}{\centering{Deterministic\linebreak change:}}
+  &\underbrace{
+    \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+    \big{(}t\big{)}}_{ \vect{\eta} (t)}	=  \left(
+      \underbrace{
+        \begin{bmatrix}
+\text{drift\_eta1} & \text{drift\_eta1\_eta2}\\ 
+\text{drift\_eta2\_eta1} & \text{drift\_eta2}
+\end{bmatrix}
+      }_{\underbrace{\vect{A}}_\textrm{DRIFT}} \underbrace{
+        \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+        \big{(}t\big{)}
+      }_{\vect{\eta} (t-1)}	+ \underbrace{
+        \begin{bmatrix}
+\text{cintStress}\\ 
+\text{cintQuality}
+\end{bmatrix}
+      }_{\underbrace{\vect{b}}_\textrm{CINT}}\right)  \quad + \nonumber \\ \\
+    \parbox{10em}{\centering{Random\linebreak change:}}
+    & \qquad \qquad \quad \underbrace{UcorSDtoChol\left\{
+      \begin{bmatrix}
+\text{diff\_eta1} & 0\\ 
+\text{diff\_eta2\_eta1} & \text{diff\_eta2}
+\end{bmatrix}\right\}
+    }_{\underbrace{\vect{G}}_\textrm{DIFFUSION}}
+    \underbrace{
+      \begin{bmatrix}
+W_{1}\\ 
+W_{2}
+\end{bmatrix} 
+      (t)}_{ \vect{W}(t)} \\ \\
+              \parbox{10em}{\centering{Observations:}}
+&\underbrace{
+      \begin{bmatrix}
+\text{Stress}\\ 
+\text{Stress2}\\ 
+\text{Quality}
+\end{bmatrix}  
+      (t)}_{\vect{Y}(t)} = 
+        \underbrace{
+          \begin{bmatrix}
+1 & 0\\ 
+0 & 0\\ 
+\text{stressLoading} & 1
+\end{bmatrix} 
+        }_{\underbrace{\vect{\Lambda}}_\textrm{LAMBDA}} \underbrace{
+          \begin{bmatrix}
+\text{eta1}\\ 
+\text{eta2}
+\end{bmatrix} 
+          (t)}_{\vect{\eta}(t)} +
+        \underbrace{
+          \begin{bmatrix}
+0\\ 
+\text{mintStress2}\\ 
+0
+\end{bmatrix} 
+        }_{\underbrace{\vect{\tau}}_\textrm{MANIFESTMEANS}} + \nonumber \\ \\
+    \parbox{10em}{\centering{Observation\linebreak noise:}}
+    & \qquad \qquad \quad  \underbrace{
+                \begin{bmatrix}
+\text{mvarStress} & 0 & 0\\ 
+0 & \text{mvarStress2} & 0\\ 
+0 & 0 & \text{mvarQuality}
+\end{bmatrix}  
+              }_{\underbrace{\vect{\Theta}}_\textrm{MANIFESTVAR}}
+              \underbrace{
+          \begin{bmatrix}
+\epsilon_{1}\\ 
+\epsilon_{2}\\ 
+\epsilon_{3}
+\end{bmatrix} 
+          (t)}_{\vect{\epsilon}(t)} \\ \\
+                \parbox{10em}{\centering{System noise\linebreak distribution per time step:}}
+          &\big[W_{j \in [1,2]}\big](t)   \sim  \mathrm{N}(0,1) \quad
+              \parbox{10em}{\centering{Observation noise\linebreak distribution:}}
+            \begin{bmatrix}
+\epsilon_{j \in [1,2]}
+\end{bmatrix} 
+            (t) \sim  \mathrm{N}(0,1) \\ \\
+      \end{aligned} \\&\textrm{Note: } UcorSDtoChol\textrm{ converts lower tri matrix of standard deviations and unconstrained correlations to Cholesky factor,} \\
+&UcorSDtoCov =\textrm{ transposed cross product of UcorSDtoChol, to give covariance, See Driver \& Voelkle (2018) p11.} \\&\textrm{Individual specific notation (subscript i) only shown for subject parameter distribution -- pop. means shown elsewhere.} \\
+\end{flalign*}
+        \end{small}
+\end{document}

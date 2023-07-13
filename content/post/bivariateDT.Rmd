@@ -1,0 +1,221 @@
+---
+title: Discrete Time Models Using ctsem?
+author: Charles Driver
+date: 'July 2023'
+lastmod: 2023-07-13T18:33:24+01:00
+slug: dtbivariate
+output: html_document
+featured: no
+image:
+  caption: ''
+preview_only: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE,results=FALSE,cache=TRUE,warning=FALSE,message=FALSE)
+slug <- 'dtbivariate'
+library(knitr)
+dir.create(slug)
+options(knitr.graphics.error=FALSE)
+
+savedir <- paste0(getwd(),'/',slug)
+```
+
+The ctsem marketing department seems to have done a poor job getting out the message that all of the dynamic systems stuff of ctsem -- fluctuating / coupled latent processes over time, intervention effects, higher order models, simple and complicated forms of heterogeneity across subjects and or time, latent interactions / state dependent parameters -- are also possible in the computationally simpler discrete time (e.g. vector autoregression / structural equation model) setting. Whether this is adviseable, or maybe just a neat stepping stone, depends on how you think about your constructs of interest and what you want to infer about them. For some elaboration on the treatment of time, consider https://osf.io/xdf72/
+
+For this example, we have collected data from workers starting a new job. The data include measures of stress, and quality of the employees output. We are interested in a) how stress and quality change from the beginning of the job, b) whether there is any evidence for one process causing the other, and c) to what extent there are individual differences in the start and long term levels of each, and if / how the individual differences are related. Disclaimer: This is a very limited / stylised / toy example to show some of the ctsem basics, for real problems please do much more.
+
+The following block loads the ctsem library then generates the data -- interesting for some but less interesting for others so perhaps skip!
+
+```{r, echo=T,out.width='100%',out.height='100%', fig.align='center',results=TRUE}
+set.seed(1)
+
+library(ctsem)
+
+#generating data - can ignore
+set.seed(3)
+gm <- ctModel(LAMBDA=matrix(c(
+  1,0,
+  .8,0,
+  0,1),ncol=2),
+  MANIFESTVAR = diag(.5,3),
+  DIFFUSION=matrix(c(.8,.5,0,.2),2,2),
+  DRIFT=c(
+    -.5,0,
+    -.3,-.2),
+  T0MEANS = c(20,-10),
+  TRAITVAR=matrix(c(1,.7,0,.2),2,2),
+  Tpoints=10,manifestNames = c('Stress','Stress2','Quality'))
+dat <-data.frame(ctGenerate(ctmodelobj = gm,n.subjects = 100,burnin = 2))
+
+head(dat)
+```
+
+
+## Model Specification 
+We specify a bivariate process model, with each process measured by a single (noisy) indicator (leaving out our second stress indicator for the time being). Intercepts (here, MANIFESTMEANS) and initial parameters (T0MEANS) default to indivdually varying, but we specify explicitly here in any case as a demonstration (using the | separator notation). In fact, we specify the entire model explicitly, while since most parameters here are freely estimated, we could have left it to ctsem defaults.
+
+```{r SimpleModel}
+model <- ctModel(
+  LAMBDA = diag(2), #factor loadings / measurement structure
+  type = 'standt', #could also choose stanct for continuous time modelling.
+  manifestNames = c('Stress','Quality'),
+  latentNames = c('Stress','Quality'),
+  T0MEANS = c('t0_stress','t0_quality'), #starting values for latent processes
+  MANIFESTMEANS = c('mi_stress||TRUE','mi_quality||TRUE'), #intercepts on observed variables
+  MANIFESTVAR = c( #vectors are coerced rowwise into matrices of the right shape, 2x2 in this case
+    'merr_stress',0,
+    0,'merr_quality'),
+  DRIFT = c(  #temporal dependence matrix, autoregression on the diagonal, cross regression off diagonal
+    'a11','a12',
+    'a21','a22'),
+  DIFFUSION = c( #system noise. sd's on diagonal, unconstrained correlations on lower triangle
+    'diff11',0,
+    'diff21','diff22'),
+  CINT = 0 #single values are repeated as many times as necessary (here, twice, one for each process)
+  )
+
+#ctModelLatex(model) #view model in pdf (i.e. readable) form. Requires latex compiler
+```
+
+```{r TEX,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(model,textsize = 'small', folder=savedir,
+  filename = 'dtbivariate',open=FALSE)
+
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/dtbivariate.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/dtbivariate.png'))
+```
+
+```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics(paste0(savedir,'/dtbivariate.png'))
+```
+
+
+
+## Model Fit and Plots
+```{r fit}
+fit <- ctStanFit(datalong = dat,ctstanmodel = model, cores=2)
+
+#ctModelLatex(fit) #view dynamic system estimates in equation form, requires latex compiler
+
+ctKalman(fit,kalmanvec=c('y','yprior'),plot=TRUE, subjects=1:2) #forward predictions
+ctKalman(fit,kalmanvec=c('y','ysmooth'),plot=TRUE, subjects=1:2) #best estimates conditional on all data
+ctKalman(fit,kalmanvec=c('y','yprior'),plot=TRUE, subjects=1,removeObs = T) #predictions before seeing any data
+
+ctStanDiscretePars(fit,plot=T)
+```
+
+The previous plot shows the discrete-time regression coefficients for different lags -- note that this is still a first order model (sometimes called lag 1), but because of the inclusion of measurement error and the possibility for missing data, higher lag effects are relevant. Put differently, the impact of a change at one point propagates further than the next observation, these plots show that propagation. 
+
+General summary information is found with the summary function, not shown here in full.
+
+```{r,results=T}
+s <- summary(fit)
+print(s$popmeans,digits=1) #basic system parameters
+```
+
+Amongst other things, from the above we can read off that the confidence interval for the a21 parameter -- the 2nd row and 1st column of the temporal effects (DRIFT) matrix, representing the cross regression coefficient for the effect of the 1st process (stress) on the 2nd process (quality), is negative and zero is well outside the 95% confidence interval. 
+
+```{r,results=T}
+print(s$rawpopcorr,digits=2) #correlations between random effect parameters
+```
+
+Here, we can see that the initial levels (t0), and long term levels (mi, for the manifest intercept) all correlate, while correlations between initial levels and long term levels appear negative. 
+
+
+```{r TEXfit,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(model,textsize = 'small', folder=savedir,
+  filename = 'dtbivariatefit',open=FALSE)
+
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/dtbivariatefit.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/dtbivariatefit.png'))
+```
+
+```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics(paste0(savedir,'/dtbivariatefit.png'))
+```
+
+
+Extending to a factor model formulation, using the additional measurement of stress we obtained, looks as follows, this time relying heavily on ctsem defaults for the free parameter specifications:
+  
+```{r factorBivariate}
+factormodel <- ctModel(type = 'standt',
+  manifestNames = c('Stress','Stress2','Quality'), 
+  LAMBDA = matrix(c(  #factor loadings / measurement structure 
+    1,0,
+    'stressLoading',0, #now with estimated factor loading for Stress2 variable
+    0,1),ncol=2))
+```
+
+```{r TEXfitfactor,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(factormodel,textsize = 'small', folder=savedir,
+  filename = 'dtbivariatefactor',open=FALSE)
+
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/dtbivariatefactor.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactor.png'))
+```
+
+```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics(paste0(savedir,'/dtbivariatefactor.png'))
+```
+
+If we wanted to allow for stable individual variation only in the latent processes, and not in the measurement intercept, we would need to free the latent, or continuous, intercept (CINT, because it is added at each step), restrict all but one of the manifest intercepts (MANIFESTMEANS) to zero, and remove the individual variation from the estimated manifest intercept. Like this:
+  
+```{r factorBivariatelatent}
+factormodellatent <- ctModel(type = 'standt',   
+  manifestNames = c('Stress','Stress2','Quality'),
+  LAMBDA = matrix(c(  #factor loadings / measurement structure 
+    1,0,
+    'stressLoading',0, #now with estimated factor loading for Stress2 variable
+    0,1), ncol=2),
+  CINT=c('cintStress','cintQuality'),
+  MANIFESTMEANS=c(0,'mintStress2||FALSE',0)) #note the two || and FALSE, disabling individual variation
+```
+
+```{r TEXfitfactorlatent,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(factormodellatent,textsize = 'small', folder=savedir,
+  filename = 'dtbivariatefactorlatent',open=FALSE)
+
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/dtbivariatefactorlatent.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactorlatent.png'))
+```
+
+```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics(paste0(savedir,'/dtbivariatefactorlatent.png'))
+```
+
+Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include tham as time independent predictors (covariate moderators). 
+
+```{r factorBivariatelatentmoderated}
+require(data.table)
+dat <- data.table(dat)
+dat[,initialStress:=mean(c(Stress[1],Stress2[1])),by=id]
+dat[,meanStress:=mean(c(Stress,Stress2)),by=id]
+head(dat)
+
+factormodellatentmod<- ctModel(type = 'standt', 
+  TIpredNames = c('initialStress','meanStress'), 
+  tipredDefault = TRUE, #by default, moderate all parameters
+  CINT=c('cintStress||||meanStress', #only moderate cintStress using meanStress
+    'cintQuality||||initialStress, meanStress'), #explicitly moderate via both covariates
+  manifestNames = c('Stress','Stress2','Quality'),
+  LAMBDA = matrix(c(  #factor loadings / measurement structure 
+    1,0,
+    'stressLoading',0, #now with estimated factor loading for Stress2 variable
+    0,1), ncol=2),
+  MANIFESTMEANS=c(0,'mintStress2||FALSE',0)) #note the two || and FALSE, disabling individual variation
+```
+
+The matrices for individual differences get pretty big now, zoom in if you like...
+
+```{r TEXfitfactorlatentmod,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
+ctModelLatex(factormodellatentmod,textsize = 'small', folder=savedir,
+  filename = 'dtbivariatefactorlatentmod',open=FALSE)
+
+bitmap <- pdftools::pdf_render_page(paste0(savedir,'/dtbivariatefactorlatentmod.pdf'),dpi=72)
+png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactorlatentmod.png'))
+```
+
+```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
+knitr::include_graphics(paste0(savedir,'/dtbivariatefactorlatentmod.png'))
+```
