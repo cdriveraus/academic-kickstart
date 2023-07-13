@@ -87,7 +87,7 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariate.png'))
 ```
 
 ```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
-knitr::include_graphics(paste0(savedir,'/dtbivariate.png'))
+knitr::include_graphics(paste0('dtbivariate.png'))
 ```
 
 
@@ -132,7 +132,7 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefit.png'))
 ```
 
 ```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
-knitr::include_graphics(paste0(savedir,'/dtbivariatefit.png'))
+knitr::include_graphics(paste0('dtbivariatefit.png'))
 ```
 
 
@@ -156,7 +156,7 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactor.png'))
 ```
 
 ```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
-knitr::include_graphics(paste0(savedir,'/dtbivariatefactor.png'))
+knitr::include_graphics(paste0('dtbivariatefactor.png'))
 ```
 
 If we wanted to allow for stable individual variation only in the latent processes, and not in the measurement intercept, we would need to free the latent, or continuous, intercept (CINT, because it is added at each step), restrict all but one of the manifest intercepts (MANIFESTMEANS) to zero, and remove the individual variation from the estimated manifest intercept. Like this:
@@ -181,7 +181,7 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactorlatent.png'))
 ```
 
 ```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
-knitr::include_graphics(paste0(savedir,'/dtbivariatefactorlatent.png'))
+knitr::include_graphics(paste0('dtbivariatefactorlatent.png'))
 ```
 
 Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include tham as time independent predictors (covariate moderators). 
@@ -217,5 +217,5 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactorlatentmod.png'))
 ```
 
 ```{r,echo=F,out.width='100%',out.height='100%', fig.align='left', fig.height=8, results=TRUE}
-knitr::include_graphics(paste0(savedir,'/dtbivariatefactorlatentmod.png'))
+knitr::include_graphics(paste0('dtbivariatefactorlatentmod.png'))
 ```
