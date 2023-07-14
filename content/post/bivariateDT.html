@@ -118,7 +118,50 @@ print(s$popmeans,digits=1) #basic system parameters
 ## mi_quality__t0_quality -0.61 0.082 -0.76 -0.62 -0.44  -7.5
 ## mi_quality__mi_stress   0.91 0.024  0.85  0.91  0.95  38.4</code></pre>
 <p>Here, we can see that the initial levels (t0), and long term levels (mi, for the manifest intercept) all correlate, while correlations between initial levels and long term levels appear negative.</p>
+<p>The fitted estimates can be seen in matrix representation too:</p>
 <p><img src="dtbivariatefit.png" width="100%" height="100%" style="display: block; margin: auto auto auto 0;" /></p>
+</div>
+<div id="predictive-checks" class="section level2">
+<h2>Predictive Checks</h2>
+<p>We can generate random samples of data based on our parameter estimates and compare these to our original data. The following is but one example of many possible checks, showing how the original data (in black) compares to the distribution of generated data (in red) over time, with means shown by the thicker dashed and solid lines. Based on only this plot, our estimated model looks like a very good match for the data. Which is not surprising because this is a toy example.</p>
+<pre class="r"><code>library(data.table)
+fit &lt;- ctStanGenerateFromFit(fit, nsamples=200, #add generated data to the fit object
+  fullposterior = F, cores = 2)
+gendat &lt;- as.data.table(fit$generated$Y) #extract generated data
+gendat[,row:=as.integer(row)] #set the row column type appropriately
+truedat &lt;- melt(data.table(row=1:nrow(dat),dat), #get original data in melted form, ready for merging
+  measure.vars = c(&#39;Stress&#39;,&#39;Stress2&#39;,&#39;Quality&#39;),variable.name = &#39;V1&#39;,value.name = &#39;TrueValue&#39;)
+gendat &lt;- merge(gendat,truedat,by = c(&#39;row&#39;,&#39;V1&#39;)) #merge original and melted data, ready for plotting
+
+library(ggplot2)
+ggplot(gendat,aes(y=value,x=time))+ 
+  stat_summary(fun.data=mean_sdl,geom=&#39;ribbon&#39;,alpha=.3,fill=&#39;red&#39;)+
+  stat_summary(aes(y = value), fun.y=mean, colour=&quot;red&quot;, geom=&quot;line&quot;,size=1)+
+  stat_summary(aes(y = TrueValue), fun.y=mean, geom=&quot;line&quot;,linetype=&#39;dashed&#39;,size=1)+
+  geom_line(aes(y=TrueValue,group=id),alpha=.2)+
+  facet_wrap(vars(V1),scales = &#39;free&#39;)+
+  theme_bw()</code></pre>
+<p><img src="/post/bivariateDT_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="residual-checks" class="section level2">
+<h2>Residual Checks</h2>
+<p>We can extract the residuals and or standardised residuals from the model fit using the ctKalman function, then check for autocorrelation in the residuals – correlated residuals imply there is information left that our model did not leverage, meaning that our model could be improved. Here we show the autocorrelation using a method that treats time continuously, as well as the standard discrete-time approach in R. Here again our model is doing fine, the residual autocorrelation is approximately zero, there is no information remaining from the earlier time points to predict the latter.</p>
+<pre class="r"><code>k=ctKalman(fit,subjects=unique(dat$id)) #get residuals and various estimates
+k=k[k$Element %in% &#39;errstdprior&#39;,] #remove everything except the residuals
+k=dcast(data = data.table(k),formula = formula(&#39;Subject + Time ~ Row&#39;)) #cast to wider format
+
+#continuous time auto and cross correlation
+library(expct) #devtools::install_github(&quot;ryanoisin/expct&quot;) 
+expct(dataset = k,Time = &#39;Time&#39;,ID = &#39;Subject&#39;,outcome=c(&#39;Quality&#39;),
+  plot_show = T,Tpred = 1:10,k = 5) #autocorrelation of residuals </code></pre>
+<p><img src="/post/bivariateDT_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>
+#discrete time auto correlation
+acf(k$Quality,lag.max=10,plot=TRUE)</code></pre>
+<p><img src="/post/bivariateDT_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+</div>
+<div id="factor-measurement-models" class="section level2">
+<h2>Factor / Measurement Models</h2>
 <p>Extending to a factor model formulation, using the additional measurement of stress we obtained, looks as follows, this time relying heavily on ctsem defaults for the free parameter specifications:</p>
 <pre class="r"><code>factormodel &lt;- ctModel(type = &#39;standt&#39;,
   manifestNames = c(&#39;Stress&#39;,&#39;Stress2&#39;,&#39;Quality&#39;), 

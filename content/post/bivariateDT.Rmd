@@ -122,6 +122,7 @@ print(s$rawpopcorr,digits=2) #correlations between random effect parameters
 
 Here, we can see that the initial levels (t0), and long term levels (mi, for the manifest intercept) all correlate, while correlations between initial levels and long term levels appear negative. 
 
+The fitted estimates can be seen in matrix representation too:
 
 ```{r TEXfit,echo=FALSE,out.width='100%',out.height='100%', fig.align='left'}
 ctModelLatex(model,textsize = 'small', folder=savedir,
@@ -135,6 +136,51 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefit.png'))
 knitr::include_graphics(paste0('dtbivariatefit.png'))
 ```
 
+## Predictive Checks
+We can generate random samples of data based on our parameter estimates and compare these to our original data. The following is but one example of many possible checks, showing how the original data (in black) compares to the distribution of generated data (in red) over time, with means shown by the thicker dashed and solid lines. Based on only this plot, our estimated model looks like a very good match for the data. Which is not surprising because this is a toy example. 
+
+
+```{r}
+library(data.table)
+fit <- ctStanGenerateFromFit(fit, nsamples=200, #add generated data to the fit object
+  fullposterior = F, cores = 2)
+gendat <- as.data.table(fit$generated$Y) #extract generated data
+gendat[,row:=as.integer(row)] #set the row column type appropriately
+truedat <- melt(data.table(row=1:nrow(dat),dat), #get original data in melted form, ready for merging
+  measure.vars = c('Stress','Stress2','Quality'),variable.name = 'V1',value.name = 'TrueValue')
+gendat <- merge(gendat,truedat,by = c('row','V1')) #merge original and melted data, ready for plotting
+
+library(ggplot2)
+ggplot(gendat,aes(y=value,x=time))+ 
+  stat_summary(fun.data=mean_sdl,geom='ribbon',alpha=.3,fill='red')+
+  stat_summary(aes(y = value), fun.y=mean, colour="red", geom="line",size=1)+
+  stat_summary(aes(y = TrueValue), fun.y=mean, geom="line",linetype='dashed',size=1)+
+  geom_line(aes(y=TrueValue,group=id),alpha=.2)+
+  facet_wrap(vars(V1),scales = 'free')+
+  theme_bw()
+
+```
+
+## Residual Checks
+
+We can extract the residuals and or standardised residuals from the model fit using the ctKalman function, then check for autocorrelation in the residuals -- correlated residuals imply there is information left that our model did not leverage, meaning that our model could be improved. Here we show the autocorrelation using a method that treats time continuously, as well as the standard discrete-time approach in R. Here again our model is doing fine, the residual autocorrelation is approximately zero, there is no information remaining from the earlier time points to predict the latter.
+
+```{r}
+k=ctKalman(fit,subjects=unique(dat$id)) #get residuals and various estimates
+k=k[k$Element %in% 'errstdprior',] #remove everything except the residuals
+k=dcast(data = data.table(k),formula = formula('Subject + Time ~ Row')) #cast to wider format
+
+#continuous time auto and cross correlation
+library(expct) #devtools::install_github("ryanoisin/expct") 
+expct(dataset = k,Time = 'Time',ID = 'Subject',outcome=c('Quality'),
+  plot_show = T,Tpred = 1:10,k = 5) #autocorrelation of residuals 
+
+#discrete time auto correlation
+acf(k$Quality,lag.max=10,plot=TRUE)
+```
+
+
+## Factor / Measurement Models
 
 Extending to a factor model formulation, using the additional measurement of stress we obtained, looks as follows, this time relying heavily on ctsem defaults for the free parameter specifications:
   
