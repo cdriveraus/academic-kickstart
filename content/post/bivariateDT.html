@@ -180,7 +180,7 @@ acf(k$Quality,lag.max=10,plot=TRUE)</code></pre>
   CINT=c(&#39;cintStress&#39;,&#39;cintQuality&#39;),
   MANIFESTMEANS=c(0,&#39;mintStress2||FALSE&#39;,0)) #note the two || and FALSE, disabling individual variation</code></pre>
 <p><img src="dtbivariatefactorlatent.png" width="100%" height="100%" style="display: block; margin: auto auto auto 0;" /></p>
-<p>Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include tham as time independent predictors (covariate moderators).</p>
+<p>Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include them as time independent predictors (covariate moderators). We also allow for random effects in the free factor loading – maybe not totally sensible in this case but simply as a demonstration how to add random effects to other parameters.</p>
 <pre class="r"><code>require(data.table)
 dat &lt;- data.table(dat)
 dat[,initialStress:=mean(c(Stress[1],Stress2[1])),by=id]
@@ -195,7 +195,7 @@ factormodellatentmod&lt;- ctModel(type = &#39;standt&#39;,
   manifestNames = c(&#39;Stress&#39;,&#39;Stress2&#39;,&#39;Quality&#39;),
   LAMBDA = matrix(c(  #factor loadings / measurement structure 
     1,0,
-    &#39;stressLoading&#39;,0, #now with estimated factor loading for Stress2 variable
+    &#39;stressLoading||TRUE&#39;,0, #estimated factor loading for Stress2 variable, now as random effect
     0,1), ncol=2),
   MANIFESTMEANS=c(0,&#39;mintStress2||FALSE&#39;,0)) #note the two || and FALSE, disabling individual variation</code></pre>
 <p>The matrices for individual differences get pretty big now, zoom in if you like…</p>

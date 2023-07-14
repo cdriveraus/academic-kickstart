@@ -230,7 +230,7 @@ png::writePNG(bitmap, paste0(savedir,'/dtbivariatefactorlatent.png'))
 knitr::include_graphics(paste0('dtbivariatefactorlatent.png'))
 ```
 
-Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include tham as time independent predictors (covariate moderators). 
+Want to account for heterogeneity in the model parameters without going wild and adding random effects (via the ||TRUE notation) to everything? Including the initial values and or mean of the observations as moderators of the parameters is one possibility. Here we first compute initial and mean values for our dataset, then include them as time independent predictors (covariate moderators). We also allow for random effects in the free factor loading -- maybe not totally sensible in this case but simply as a demonstration how to add random effects to other parameters.
 
 ```{r factorBivariatelatentmoderated}
 require(data.table)
@@ -247,7 +247,7 @@ factormodellatentmod<- ctModel(type = 'standt',
   manifestNames = c('Stress','Stress2','Quality'),
   LAMBDA = matrix(c(  #factor loadings / measurement structure 
     1,0,
-    'stressLoading',0, #now with estimated factor loading for Stress2 variable
+    'stressLoading||TRUE',0, #estimated factor loading for Stress2 variable, now as random effect
     0,1), ncol=2),
   MANIFESTMEANS=c(0,'mintStress2||FALSE',0)) #note the two || and FALSE, disabling individual variation
 ```
